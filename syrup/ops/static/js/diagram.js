@@ -8,6 +8,13 @@
 // air — the detail lives in each tab. Every node is live and clickable.
 // DO NOT rewrite this chart. The data-node/data-edge ids each box emits drive
 // the live animation via the STAGE map below — keep the two in sync.
+//
+// The captions go through tr(); the geometry and every data-node/data-edge id do
+// not. That split is the whole reason the freeze survives translation: a node's
+// NAME is vocabulary (CONTEXT.md defines "Gateway", "Loop", "Retrieval gate"),
+// while the line under it is an explanation, and only explanations switch
+// language. archSVG re-runs on every render, so a language flip redraws the
+// chart in place — no duplicated zh/en text nodes toggled by opacity.
 function archSVG(d){
   const s = d.stats;
   const box = (x,y,w,h,title,sub,view,cls="",nid="") =>
@@ -27,72 +34,76 @@ function archSVG(d){
     <!-- HARNESS container: everything runs on your laptop, including the
          offline LLM Ops loop (tinted sub-panel) -->
     <rect class="container" x="12" y="20" width="1020" height="628" rx="16"/>
-    ${lbl(16,4,"HARNESS — runs on your laptop · the turn inside is ephemeral")}
+    ${lbl(16,4,tr("diag.harness"))}
 
     <!-- the turn: gateway → working memory → loop → reply -->
-    ${box(32,72,128,56,"Gateway","cli · voice · web","chat","","gateway")}
+    <!-- Links to #gateway, the conversation inbox. It used to link to #chat,
+         which no view has ever defined, so the router quietly fell back to
+         Overview: clicking the Gateway box on the Overview chart reloaded the
+         page you were already on. -->
+    ${box(32,72,128,56,"Gateway",tr("diag.gatewaySub"),"gateway","","gateway")}
     ${flow("M160 100 L192 100","","e-gw-wm")}
-    ${box(192,72,144,56,"Working memory","assembled per turn","memory/overview","","wm")}
+    ${box(192,72,144,56,"Working memory",tr("diag.wmSub"),"memory/overview","","wm")}
 
     <rect class="loopbox" x="370" y="56" width="168" height="166" rx="12"/>
     ${lbl(384,48,"LOOP")}
-    ${box(384,72,140,50,"LLM agent","reason","loop","","llm")}
-    ${box(384,152,140,52,"Tools","create_event…","tools","","tools")}
+    ${box(384,72,140,50,"LLM agent",tr("diag.llmSub"),"loop","","llm")}
+    ${box(384,152,140,52,"Tools",tr("diag.toolsSub"),"tools","","tools")}
     ${flow("M448 122 L448 152")}${flow("M470 152 L470 122")}
-    ${flowLbl(456,141,"act")}
+    ${flowLbl(456,141,tr("diag.act"))}
     ${flow("M336 100 L370 100","","e-wm-loop")}
-    ${flow("M538 100 L558 106")}${flowLbl(542,93,"reply")}
-    ${box(558,84,104,52,"Reply","→ back to you","loop","","reply")}
+    ${flow("M538 100 L558 106")}${flowLbl(542,93,tr("diag.reply"))}
+    ${box(558,84,104,52,"Reply",tr("diag.replySub"),"loop","","reply")}
     <!-- The gateway is the door IN and OUT: the reply leaves through the very
          gateway it arrived at (Telegram sends it, the CLI prints it, voice
          speaks it, the dashboard streams it). A clean over-the-top arc. -->
     <path class="flow" data-edge="e-reply-gw" d="M610 84 C610 40 596 34 566 34 L130 34 C104 34 96 44 96 72" marker-end="url(#arr)"/>
-    ${flowLbl(348,28,"reply, out the same gateway","middle")}
+    ${flowLbl(348,28,tr("diag.replyOut"),"middle")}
     <!-- every turn is saved for consolidation: down a clear right lane,
          then left into the consolidation box -->
     <path class="flow dash" data-edge="e-reply-save" d="M650 136 C660 150 660 200 660 600 L430 600" marker-end="url(#arr)"/>
-    ${flowLbl(668,214,"save chats",'start')}
+    ${flowLbl(668,214,tr("diag.saveChats"),'start')}
 
     <!-- retrieval gate feeding working memory (the hero) -->
     <path class="gate node" data-node="gate" onclick="location.hash='memory/overview'" d="M264 250 L340 296 L264 342 L188 296 Z"/>
-    <text class="nt" x="264" y="292" text-anchor="middle" style="pointer-events:none">Retrieval gate</text>
-    <text class="ns" x="264" y="310" text-anchor="middle" style="pointer-events:none">${s.gate_skips} skip · ${s.gate_retrieves} retrieve</text>
-    ${flow("M264 250 L264 128","dash","e-gate-wm")}${flowLbl(274,196,"only if needed")}
+    <text class="nt" x="264" y="292" text-anchor="middle" style="pointer-events:none">${tr("diag.gateTitle")}</text>
+    <text class="ns" x="264" y="310" text-anchor="middle" style="pointer-events:none">${tr("diag.gateSub", s.gate_skips, s.gate_retrieves)}</text>
+    ${flow("M264 250 L264 128","dash","e-gate-wm")}${flowLbl(274,196,tr("diag.onlyIfNeeded"))}
 
     <!-- MEMORY: grouped section with a direct link from the gate to each pillar -->
-    ${lbl(40,404,"MEMORY — three pillars")}
+    ${lbl(40,404,tr("diag.memPillars"))}
     <rect class="memgroup" x="28" y="414" width="600" height="128" rx="12"/>
     ${flow("M148 452 L246 336","dash","e-gate-proc")}
     ${flow("M340 452 L272 344","dash","e-gate-sem")}
     ${flow("M542 452 L286 338","dash","e-gate-epi")}
-    ${flowLbl(356,392,"the gate reads all three",'middle')}
-    ${box(44,452,208,72,"Procedural","how to act · SKILL.md · "+d.skills.length+" skill(s)","memory/skills","","procedural")}
-    ${box(264,452,204,72,"Semantic · FTS5","durable facts · "+d.facts.length+" facts","memory/semantic","","semantic")}
-    ${box(480,452,132,72,"Episodic",d.episodes.length+" episodes","memory/episodic","","episodic")}
+    ${flowLbl(356,392,tr("diag.readsAll"),'middle')}
+    ${box(44,452,208,72,"Procedural",tr("diag.procSub",d.skills.length),"memory/skills","","procedural")}
+    ${box(264,452,204,72,"Semantic · FTS5",tr("diag.semSub",d.facts.length),"memory/semantic","","semantic")}
+    ${box(480,452,132,72,"Episodic",tr("diag.epiSub",d.episodes.length),"memory/episodic","","episodic")}
 
     <!-- consolidation writes back into memory -->
-    ${box(44,576,384,52,"Consolidation · every "+d.consolidate_every+" exchanges",d.chat_pending+"/"+d.consolidate_every*2+" queued → distilled into facts","memory/consolidation","","consolidation")}
-    ${flow("M340 576 L340 528","","e-consol-sem")}${flowLbl(350,560,"distill")}
+    ${box(44,576,384,52,tr("diag.consTitle",d.consolidate_every),tr("diag.consSub",d.chat_pending,d.consolidate_every*2),"memory/consolidation","","consolidation")}
+    ${flow("M340 576 L340 528","","e-consol-sem")}${flowLbl(350,560,tr("diag.distill"))}
 
     <!-- LLM OPS: the offline improvement loop — inside the harness (it all
          runs on the laptop) but a distinct tinted sub-panel -->
     <rect class="container ops" x="736" y="40" width="280" height="372" rx="14"/>
-    ${lbl(752,64,"LLM OPS — offline improvement loop")}
-    ${flowLbl(752,80,"observes each run · improves the agent",'start')}
+    ${lbl(752,64,tr("diag.opsTitle"))}
+    ${flowLbl(752,80,tr("diag.opsSub"),'start')}
     <!-- every turn crosses the gap to feed the trace -->
     <path class="flow" data-edge="e-reply-trace" d="M660 104 C700 100 726 100 752 106" marker-end="url(#arr)"/>
-    ${flowLbl(688,96,"each turn")}
-    ${box(752,92,250,50,"Trace",s.trace_files+" file(s) · always on","ops","","trace")}
+    ${flowLbl(688,96,tr("diag.eachTurn"))}
+    ${box(752,92,250,50,"Trace",tr("diag.traceSub",s.trace_files),"ops","","trace")}
     ${flow("M878 142 L878 156")}
-    ${box(752,156,250,50,"Eval","deterministic + judge","ops")}
+    ${box(752,156,250,50,"Eval",tr("diag.evalSub"),"ops")}
     ${flow("M878 206 L878 220")}
-    ${box(752,220,250,50,"Release gate",d.eval_report?"det "+d.eval_report.deterministic+" · judge "+d.eval_report.judge:"run make gate","ops")}
+    ${box(752,220,250,50,tr("diag.releaseGate"),d.eval_report?tr("diag.gateScore",d.eval_report.deterministic,d.eval_report.judge):tr("diag.gateRun"),"ops")}
     ${flow("M878 270 L878 284")}
-    ${box(752,284,250,50,"Release","new prompt · model · config","ops")}
+    ${box(752,284,250,50,"Release",tr("diag.releaseSub"),"ops")}
     <!-- feedback: Release improves the Harness — a short arrow across the gap,
          so the outer loop closes without a long wrap crowding the margins -->
     <path class="flow dash" d="M752 312 C712 324 698 352 676 358" marker-end="url(#arr)"/>
-    ${flowLbl(596,346,"improved prompt + config",'end')}
+    ${flowLbl(596,346,tr("diag.improved"),'end')}
   </svg></div>`;
 }
 
@@ -102,13 +113,15 @@ function archSVG(d){
 // archSVG emits above — change one, change the other (that's why both live in
 // this file). test_static_assets.py won't catch a mismatch here; the animation
 // just silently stops lighting a box.
+// `label` is an i18n KEY, not a string: these are read at animation time, which
+// can be either side of a language flip.
 const STAGE = {
-  turn_start:    {nodes:["gateway","wm"],            edges:["e-gw-wm"],                 label:"message in"},
-  gate:          {nodes:["gate"],                    edges:["e-gate-wm"],               label:"retrieval gate"},
-  llm:           {nodes:["llm"],                     edges:["e-wm-loop"],               label:"agent reasons"},
-  tool:          {nodes:["tools"],                   edges:[],                          label:"tool runs"},
-  turn_end:      {nodes:["reply","trace"],           edges:["e-reply-trace","e-reply-save"], label:"reply"},
-  consolidation: {nodes:["consolidation","semantic"],edges:["e-consol-sem"],            label:"consolidating memory"},
+  turn_start:    {nodes:["gateway","wm"],            edges:["e-gw-wm"],                 label:"stage.turnStart"},
+  gate:          {nodes:["gate"],                    edges:["e-gate-wm"],               label:"stage.gate"},
+  llm:           {nodes:["llm"],                     edges:["e-wm-loop"],               label:"stage.llm"},
+  tool:          {nodes:["tools"],                   edges:[],                          label:"stage.tool"},
+  turn_end:      {nodes:["reply","trace"],           edges:["e-reply-trace","e-reply-save"], label:"stage.turnEnd"},
+  consolidation: {nodes:["consolidation","semantic"],edges:["e-consol-sem"],            label:"stage.consolidation"},
 };
 let evCursor = null, evQueue = [], playing = false, animating = false;
 
@@ -122,7 +135,7 @@ function animateStage(ev){
   if (GRAPH_KINDS.has(ev.type)) return animateGraphStage(ev);   // graph.js owns these
   const spec = STAGE[ev.type];
   if (!spec || !document.querySelector(".arch")) return;
-  document.querySelectorAll(".arch-status").forEach(st => st.innerHTML = `<span class="live-dot"></span>${spec.label}`);
+  document.querySelectorAll(".arch-status").forEach(st => st.innerHTML = `<span class="live-dot"></span>${esc(tr(spec.label))}`);
   spec.nodes.forEach(n => hot(`[data-node="${n}"]`, "hot", 1000));
   spec.edges.forEach(e => hot(`[data-edge="${e}"]`, "live", 1000));
   if (ev.type==="gate" && ev.decision==="retrieve"){

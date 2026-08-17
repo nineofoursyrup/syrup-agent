@@ -45,7 +45,7 @@ function graphSVG(wf, opts = {}){
   // network) — what tool nodes share is that NO MODEL RUNS. And "small model"
   // was true of triage's classify and false of gather's synthesize, which uses
   // the main one; the kind alone does not know which, so do not claim.
-  const SUB = {llm: "one model call", agent: "THE loop, as a node", tool: "code, no model", fn: ""};
+  const SUB = {llm: tr("graph.subLlm"), agent: tr("graph.subAgent"), tool: tr("graph.subTool"), fn: ""};
   const nodeBox = n => {
     const p = pos[n];
     if (n === "START" || n === "END")
@@ -107,30 +107,26 @@ function graphPanel(d){
   const seg = (cls, n, label, pct) =>
     `<div class="${cls}" style="width:${pct}%">${pct >= 14 ? `${n} ${label}` : ""}</div>`;
   const split = !tot
-    ? `<div class="meta" style="margin:6px 0 10px">no graph turns yet — every message will route here once it's on</div>`
+    ? `<div class="meta" style="margin:6px 0 10px">${esc(tr("graph.noGraphTurns"))}</div>`
     : `<div class="splitbar">
-        ${seg("seg-skip", g.stats.quick, "quick", Math.round(g.stats.quick / tot * 100))}
-        ${seg("seg-ret", g.stats.full, "full", 100 - Math.round(g.stats.quick / tot * 100))}
-      </div><div class="meta" style="margin:6px 0 10px">${g.stats.quick} answered by the small model alone — the loop never woke</div>`;
+        ${seg("seg-skip", g.stats.quick, tr("graph.quick"), Math.round(g.stats.quick / tot * 100))}
+        ${seg("seg-ret", g.stats.full, tr("graph.full"), 100 - Math.round(g.stats.quick / tot * 100))}
+      </div><div class="meta" style="margin:6px 0 10px">${esc(tr("graph.quickAnswered", g.stats.quick))}</div>`;
   // The flag gates TRIAGE — the per-message door — and nothing else. `syrup
   // gather` is a routine you start yourself and runs regardless, so the old
   // copy ("off = every turn runs the classic loop") was quietly false the
   // moment a second workflow existed.
   if (!g.enabled && !last)
-    return `<div class="card"><div class="meta">The per-message graph door is <b>off</b> — every chat turn
-      runs the classic loop above. Switch on <b>graph workflows</b> in
-      <a class="reveal" onclick="location.hash='settings'">Behaviour</a> to triage each message first.
-      Workflows you run yourself, like <code>make gather</code>, do not need the flag —
-      <a class="reveal" onclick="location.hash='graph'">see them here</a>.</div></div>`;
+    return `<div class="card"><div class="meta">${tr("graph.panelOff")}</div></div>`;
   const when = GRAPH_LIVE
-    ? `<span class="live-dot"></span><b>${esc(GRAPH_LIVE)}</b> running now`
+    ? `<span class="live-dot"></span>${tr("graph.runningNow", esc(GRAPH_LIVE))}`
     : last
-    ? `last run: <b>${esc(last.workflow || "")}</b>${last.ms ? ` · ${(last.ms/1000).toFixed(1)}s` : ""}${
-        last.steps ? ` · ${last.steps} nodes` : ""}`
-    : "live — nodes light up as a turn flows through";
+    ? `${tr("graph.lastRun", esc(last.workflow || ""))}${last.ms ? ` · ${(last.ms/1000).toFixed(1)}s` : ""}${
+        last.steps ? esc(tr("graph.nNodes", last.steps)) : ""}`
+    : esc(tr("graph.liveHint"));
   return `<div class="card" style="cursor:pointer" onclick="location.hash='graph'">
     ${g.enabled ? split : ""}${wf ? graphSVG(wf) : ""}
-    <div class="meta" style="margin-top:8px">${when} · click for the full story</div></div>`;
+    <div class="meta" style="margin-top:8px">${when}${esc(tr("graph.clickFull"))}</div></div>`;
 }
 
 // --- live animation: same machinery as the loop's STAGE map. hot() lights
@@ -147,11 +143,11 @@ function animateGraphStage(ev){
     // Swap the Overview chart to this workflow before anything runs, so the
     // nodes about to light up are the ones on screen.
     graphLive(w);
-    status(`${w} starts`);
+    status(esc(tr("graph.starts", w)));
     hot(`[data-node="g-${w}-START"]`, "hot", 1000);
   }
   else if (ev.type === "node_start"){
-    status(`${w} · ${ev.node}`);
+    status(esc(`${w} · ${ev.node}`));
     // Held, not pulsed: a node is lit for as long as it is WORKING. Pulsing on
     // node_end only ever showed you what had already finished, which is the
     // opposite of watching it happen — and with four nodes in one wave it is
@@ -165,7 +161,7 @@ function animateGraphStage(ev){
     hot(`[data-node="g-${w}-${ev.node}"]`, "done", 900);
   }
   else if (ev.type === "route"){
-    status(`route → ${ev.target}`);
+    status(esc(tr("graph.routeTo", ev.target)));
     hot(`[data-edge="g-${w}-${ev.router}-${ev.target}"]`, "live", 1400);
     hot(`[data-node="g-${w}-${ev.target}"]`, "hot", 1400);
   }
@@ -276,7 +272,7 @@ function graphCol(name){
   const n = graphRun.nodes[name] || {status: "waiting"};
   if (n.status === "waiting")
     return `<div class="cmp-col" style="opacity:.5"><div class="cmp-h"><b>${esc(name)}</b></div>
-      <div class="meta">queued</div></div>`;
+      <div class="meta">${esc(tr("graph.queued"))}</div></div>`;
   if (n.status === "running"){
     const el = ((performance.now() - n.startedAt) / 1000).toFixed(1);
     return `<div class="cmp-col"><div class="cmp-h"><b>${esc(name)}</b></div>
@@ -296,9 +292,9 @@ function graphCol(name){
   return `<div class="cmp-col"><div class="cmp-h"><b>${esc(name)}</b>
       <span class="chip">${n.ms}ms</span></div>
     <div class="wavebar"><i style="width:${pct}%"></i></div>
-    <div class="meta">${waited > 20 && peers.length > 1
-      ? `waited ${(waited/1000).toFixed(1)}s at the barrier`
-      : (peers.length > 1 ? "set the pace for this wave" : "")}</div>
+    <div class="meta">${esc(waited > 20 && peers.length > 1
+      ? tr("graph.waitedAt", (waited/1000).toFixed(1))
+      : (peers.length > 1 ? tr("graph.setPace") : ""))}</div>
     <div class="meta">${(n.keys || []).map(k => `<span class="chip">${esc(k)}</span>`).join(" ")}</div>
   </div>`;
 }
@@ -306,24 +302,23 @@ function graphCol(name){
 function graphRunPanel(){
   const R = graphRun;
   const btn = `<button class="btn" onclick="runGraph('gather')" ${R.running ? "disabled" : ""}>
-    ${R.running ? "running…" : "Run gather"}</button>`;
-  let h = `<h2>Run it — watch the wave <span class="meta" style="font-weight:400">
-    the chart shows the shape; these cards show it happening</span></h2>
+    ${esc(R.running ? tr("graph.running") : tr("graph.runGather"))}</button>`;
+  let h = `<h2>${esc(tr("graph.runH"))} <span class="meta" style="font-weight:400">
+    ${esc(tr("graph.runSub"))}</span></h2>
     <div class="card">${btn}
-    <span class="meta" style="margin-left:10px">fetches GitHub, the web, your calendar and your
-    memory — together. Proposes only: the digest lands in the outbox.</span>`;
+    <span class="meta" style="margin-left:10px">${esc(tr("graph.gatherWhat"))}</span>`;
   if (R.error) h += `<div class="meta" style="color:var(--bad);margin-top:10px">${esc(R.error)}</div>`;
   R.waves.forEach((w, i) => {
     const done = w.nodes.filter(n => (R.nodes[n] || {}).ms != null);
     const slowest = done.length ? Math.max(...done.map(n => R.nodes[n].ms)) : 0;
     const sum = done.reduce((a, n) => a + R.nodes[n].ms, 0);
-    h += `<div class="meta" style="margin:14px 0 6px">wave ${i + 1} · ${w.nodes.length}
-      node${w.nodes.length > 1 ? "s" : ""}${slowest ? ` · ${(slowest/1000).toFixed(1)}s`
-      + (w.nodes.length > 1 ? ` (in sequence it would be ${(sum/1000).toFixed(1)}s)` : "") : ""}</div>
+    h += `<div class="meta" style="margin:14px 0 6px">${esc(tr("graph.waveN", i + 1, w.nodes.length))}${
+      slowest ? ` · ${(slowest/1000).toFixed(1)}s`
+      + (w.nodes.length > 1 ? esc(tr("graph.inSequence", (sum/1000).toFixed(1))) : "") : ""}</div>
       <div class="cmp-grid">${w.nodes.map(graphCol).join("")}</div>`;
   });
-  if (R.totalMs) h += `<div class="meta" style="margin-top:12px">finished in
-    ${(R.totalMs/1000).toFixed(1)}s${R.draft ? ` · saved to <code>${esc(R.draft)}</code>` : ""}</div>`;
+  if (R.totalMs) h += `<div class="meta" style="margin-top:12px">${
+    esc(tr("graph.finishedIn", (R.totalMs/1000).toFixed(1)))}${R.draft ? tr("graph.savedTo", esc(R.draft)) : ""}</div>`;
   if (R.digest) h += `<div class="card" style="margin-top:10px">${renderMarkdown(R.digest)}</div>`;
   return h + `</div>`;
 }

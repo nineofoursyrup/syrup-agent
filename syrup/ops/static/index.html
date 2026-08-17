@@ -1,18 +1,24 @@
-<!doctype html><html><head><meta charset="utf-8">
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Syrup</title>
 <link rel="stylesheet" href="/static/style.css"></head><body>
 <nav id="nav">
-  <div class="brand">Syrup<small id="model" style="cursor:pointer" title="click to change the model" onclick="location.hash='#models'"></small>
-    <button id="nav-toggle" title="Hide sidebar">&#10094;</button></div>
+  <!-- Identity block: who is running, on which brain, at which address. Three
+       facts a local-first tool should never make you go looking for. The live
+       dot is the same pulse the header pill uses, so "it is up" reads the same
+       in both places. -->
+  <div class="navhead">
+    <div class="brand">Syrup<span class="ver" id="ver"></span>
+      <button id="nav-toggle" data-i18n-title="chrome.hideNav">&#10094;</button></div>
+    <div class="navbrain" onclick="location.hash='#models'" data-i18n-title="dock.modelHint"><span class="livedot"></span><span id="model"></span></div>
+    <div class="navhost" id="host"></div>
+  </div>
   <div class="grp">System</div>
   <a href="#overview" data-v="overview">Overview</a>
   <a href="#gateway" data-v="gateway">Gateway <span class="n" id="n-gw"></span></a>
   <a href="#loop" data-v="loop">Loop <span class="n" id="n-loop"></span></a>
   <a href="#graph" data-v="graph">Graph <span class="n" id="n-graph"></span></a>
   <a href="#memory" data-v="memory">Memory <span class="n" id="n-mem"></span></a>
-  <a href="#tools" data-v="tools">Tools <span class="n" id="n-tools"></span></a>
-  <a href="#database" data-v="database">Database <span class="n" id="n-db"></span></a>
   <a href="#ops" data-v="ops">Ops <span class="n" id="n-ops"></span></a>
   <!-- Arena belongs to System: like every row above it, it is a place you WATCH
        something run — models racing through the real loop rather than one turn.
@@ -21,44 +27,67 @@
        sub-tabs inside the page, the way Memory holds semantic / episodic /
        skills / soul. -->
   <a href="#compare" data-v="compare">Arena</a>
+  <!-- Data, not System: Tools is the list of what the agent can call and
+       Database is the file it all lands in. Both are things you LOOK UP, not
+       things you watch happen — which is the split the design draws. -->
+  <div class="grp">Data</div>
+  <a href="#tools" data-v="tools">Tools <span class="n" id="n-tools"></span></a>
+  <a href="#database" data-v="database">Database <span class="n" id="n-db"></span></a>
   <div class="grp">Setup</div>
   <a href="#models" data-v="models">Models</a>
   <a href="#connections" data-v="connections">Connections</a>
   <a href="#settings" data-v="settings">Behaviour</a>
+  <!-- Footer: the language switch, then the two files this whole page is a view
+       of. Naming them here is the point — everything above is rendered FROM
+       these, and you can open them yourself. -->
+  <div class="navfoot">
+    <div class="langtoggle" data-i18n-title="chrome.langHint">
+      <button data-lang-btn="zh" onclick="setLang('zh')">中文</button>
+      <button data-lang-btn="en" onclick="setLang('en')">EN</button>
+    </div>
+    <div class="navfiles" id="navfiles"></div>
+  </div>
 </nav>
-<div class="resizer" id="nav-resizer" title="Drag to resize sidebar"></div>
+<div class="resizer" id="nav-resizer" data-i18n-title="chrome.resizeNav"></div>
 <main>
   <header class="pagehead">
-    <h1 id="title">Overview</h1>
-    <div class="sub" id="sub"></div>
+    <div class="headtext">
+      <div class="eyebrow" id="eyebrow"></div>
+      <h1 id="title">Overview</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="livepill" id="livepill"></div>
   </header>
   <div id="view"></div>
 </main>
-<div class="resizer" id="dock-resizer" title="Drag to resize chat"></div>
+<div class="resizer" id="dock-resizer" data-i18n-title="chrome.resizeDock"></div>
 <aside id="dock">
   <div class="dockhead">
-    <span class="dt">Chat</span>
+    <span class="dt" data-i18n="dock.title">Chat</span>
     <span class="arch-status"></span>
-    <button id="dock-close" title="Collapse chat">&rsaquo;</button>
+    <button id="dock-close" data-i18n-title="chrome.closeDock">&rsaquo;</button>
   </div>
   <div class="sesshead" style="padding:8px 2px 0">
-    <button class="sessbtn" onclick="newChat()">+ New chat</button>
-    <button class="sessbtn" onclick="toggleSessMenu(event)">History &#9662;</button>
-    <button class="sessbtn teletoggle" id="teletoggle" onclick="toggleTele()" title="Show/hide per-turn stats: gate decision, seconds, iterations, tools">stats</button>
-    <button class="modelchip" id="modelchip" onclick="toggleModelMenu(event)" title="Switch the model for this chat">&hellip;</button>
+    <button class="sessbtn" onclick="newChat()" data-i18n="dock.new">+ New chat</button>
+    <button class="sessbtn" onclick="toggleSessMenu(event)"><span data-i18n="dock.history">History</span> &#9662;</button>
+    <button class="sessbtn teletoggle" id="teletoggle" onclick="toggleTele()"
+            data-i18n="dock.stats" data-i18n-title="dock.statsHint">stats</button>
+    <button class="modelchip" id="modelchip" onclick="toggleModelMenu(event)" data-i18n-title="dock.modelHint">&hellip;</button>
   </div>
   <div class="chatlog" id="docklog"></div>
   <div class="chatbar">
-    <input id="dmsg" placeholder="Message Syrup&hellip;" autocomplete="off">
-    <button id="mic" title="Click to talk — local Whisper, no cloud"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
-    <button id="dsend">Send</button>
+    <input id="dmsg" data-i18n-ph="dock.placeholder" autocomplete="off">
+    <button id="mic" data-i18n-title="dock.micHint"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button id="dsend" data-i18n="dock.send">Send</button>
   </div>
 </aside>
-<button id="nav-reopen" title="Show sidebar">&#9776;</button>
-<button id="dock-reopen" title="Open chat">&lsaquo; Chat</button>
+<button id="nav-reopen" data-i18n-title="chrome.showNav">&#9776;</button>
+<button id="dock-reopen" data-i18n-title="chrome.openDock">&lsaquo; <span data-i18n="dock.title">Chat</span></button>
 <!-- Frontend is split into focused classic scripts sharing one global scope
-     (no build step, no modules). Order matters only in that main.js runs the
+     (no build step, no modules). Order matters in two places: i18n.js runs
+     FIRST (every other file calls t() at render time) and main.js runs the
      bootstrap and must load LAST. See static/README.md for the file map. -->
+<script src="/static/js/i18n.js"></script>
 <script src="/static/js/util.js"></script>
 <script src="/static/js/memory.js"></script>
 <script src="/static/js/models.js"></script>

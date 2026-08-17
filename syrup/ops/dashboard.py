@@ -62,6 +62,18 @@ PORT = 9049
 STATIC = Path(__file__).resolve().parent / "static"
 
 
+def _package_version() -> str:
+    """The installed version, for the sidebar's wordmark. Falls back to "dev"
+    rather than raising: running from a clone without an install is the normal
+    development case, and a missing version must never take the page down."""
+    try:
+        from importlib.metadata import version
+
+        return version("syrup-agent")   # the distribution name, not the package
+    except Exception:
+        return "dev"
+
+
 def chat(message: str) -> dict:
     """One turn, one JSON result — the non-streaming door to the same room.
 
@@ -443,6 +455,10 @@ def collect() -> dict:
     return {
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "home": str(home.resolve()),
+        # The sidebar prints this next to the wordmark. Read from the installed
+        # package rather than hardcoded in the frontend, so a released build can
+        # never claim a version it isn't.
+        "version": _package_version(),
         "provider": settings.provider,
         "model": info["model"],
         "stats": {

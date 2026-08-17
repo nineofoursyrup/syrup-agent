@@ -76,7 +76,7 @@ function copyCode(btn){
   const code = btn.closest(".mdcode").querySelector("pre code");
   navigator.clipboard.writeText(code.textContent).then(() => {
     const orig = btn.textContent;
-    btn.textContent = "Copied!"; btn.classList.add("copied");
+    btn.textContent = tr("atom.copied"); btn.classList.add("copied");
     setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 2000);
   });
 }
@@ -84,7 +84,7 @@ function copyMsg(btn){
   const text = btn.getAttribute("data-text") || "";
   navigator.clipboard.writeText(text).then(() => {
     const orig = btn.textContent;
-    btn.textContent = "Copied!"; btn.classList.add("copied");
+    btn.textContent = tr("atom.copied"); btn.classList.add("copied");
     setTimeout(() => { btn.textContent = orig; btn.classList.remove("copied"); }, 2000);
   });
 }
@@ -116,11 +116,11 @@ const gwTags = s => (s.sources||[]).map(src =>
 
 // "12 msg · 2026-07-26 21:56" — a session's size and when it last moved.
 const sessionMeta = s =>
-  `${s.messages} msg · ${esc((s.last_at||"").slice(0,16).replace("T"," "))}`;
+  `${esc(tr("dock.msgN", s.messages))} · ${esc((s.last_at||"").slice(0,16).replace("T"," "))}`;
 
 // One tool in a stage strip. Shared by the chat dock's harness strip
 // (render.js) and the arena's per-card strip (compare.js) — those two strips
 // are otherwise different on purpose (the arena has no gate/reply stage and
 // wraps), but the chip itself must look identical in both or the same tool
 // call appears to be two different things.
-const toolChip = name => `<span class="stage done">tool · ${esc(name)}</span>`;
+const toolChip = name => `<span class="stage done">${esc(tr("atom.tool", name))}</span>`;

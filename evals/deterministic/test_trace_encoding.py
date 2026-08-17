@@ -104,9 +104,18 @@ def test_tracer_refuses_to_append_to_legacy_non_utf8_trace(tmp_path):
 
 
 def test_dashboard_ops_view_surfaces_trace_encoding_errors():
-    views = (
-        Path(__file__).resolve().parents[2] / "syrup" / "ops" / "static" / "js" / "views.js"
-    ).read_text(encoding="utf-8")
+    """The Ops view reads d.trace_errors and labels each one for a human.
+
+    The label itself moved into the bilingual catalog (js/i18n.js) when the
+    dashboard went 中文/English, so the view now names the KEY and i18n.js holds
+    both wordings. Assert the pair — the view still has to ask for a label, and
+    a label still has to exist — rather than one English string in one file,
+    which is what this test used to check and what translation broke."""
+    static = Path(__file__).resolve().parents[2] / "syrup" / "ops" / "static"
+    views = (static / "js" / "views.js").read_text(encoding="utf-8")
+    catalog = (static / "js" / "i18n.js").read_text(encoding="utf-8")
 
     assert "trace_errors" in views
-    assert "trace encoding error" in views
+    assert 'tr("ops.traceEncErr")' in views
+    assert '"ops.traceEncErr":' in catalog
+    assert "trace encoding error" in catalog

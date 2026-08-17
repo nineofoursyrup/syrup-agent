@@ -5,9 +5,9 @@
 async function saveSettings(){
   const experimental = document.getElementById("set-experimental")?.value;
   const graph_workflows = document.getElementById("set-graph-workflows")?.value;
-  document.getElementById("set-msg").textContent = "switching…";
+  document.getElementById("set-msg").textContent = tr("set.switching");
   const r = await postJSON("/api/settings", {experimental, graph_workflows});
-  document.getElementById("set-msg").textContent = r.error ? ("Error: "+r.error) : "Saved.";
+  document.getElementById("set-msg").textContent = r.error ? tr("atom.error", r.error) : tr("set.saved");
 }
 function markEditing(){ editing = true; }
 
@@ -24,20 +24,20 @@ async function loadModelList(){
   }
   const ms = modelCatalog.models || [];
   dl.innerHTML = ms.map(m => {
-    const price = m.free ? "free" : (m.price_out != null ? `$${m.price_in}/$${m.price_out} per M` : "");
-    const tags = [price, m.tools === false ? "chat-only" : "", m.reasoning ? "reasoning" : "",
-                  m.context ? Math.round(m.context/1000) + "k ctx" : ""].filter(Boolean).join(" · ");
+    const price = m.free ? tr("model.free") : (m.price_out != null ? tr("model.perM", m.price_in, m.price_out) : "");
+    const tags = [price, m.tools === false ? tr("model.chatOnly") : "", m.reasoning ? tr("model.reasoning") : "",
+                  m.context ? tr("model.ctx", Math.round(m.context/1000)) : ""].filter(Boolean).join(" · ");
     return `<option value="${esc(m.id)}">${esc(tags)}</option>`;
   }).join("");
   const msg = document.getElementById("model-list-msg");
   if (!msg) return;
   if (modelCatalog.listed){
     const free = ms.filter(m=>m.free), freeTools = free.filter(m=>m.tools);
-    msg.textContent = `${ms.length} models on ${modelCatalog.endpoint}` +
-      (free.length ? ` · ${free.length} free, ${freeTools.length} of those tool-capable (Syrup needs tool calling)` : "") +
-      ` · type in the field above to search`;
+    msg.textContent = tr("model.listedCount", ms.length, modelCatalog.endpoint) +
+      (free.length ? tr("model.freeCount", free.length, freeTools.length) : "") +
+      tr("model.searchHint");
   } else {
-    msg.textContent = modelCatalog.error ? `model list unavailable: ${modelCatalog.error}` : "";
+    msg.textContent = modelCatalog.error ? tr("model.listUnavail", modelCatalog.error) : "";
   }
   renderCatalog();
 }
@@ -52,20 +52,20 @@ let catFilter = {q: "", free: false, tools: false};
 function modelRow(m, st){
   const cur = m.id === st.model, curGate = m.id === st.small_model;
   const isPinned = (st.pinned || []).some(p => p.provider === st.provider && p.model === m.id);
-  const price = m.free ? "free" : (m.price_out != null ? `$${m.price_in}/$${m.price_out} per M` : "");
-  const tags = [price, m.context ? Math.round(m.context/1000) + "k ctx" : ""]
+  const price = m.free ? tr("model.free") : (m.price_out != null ? tr("model.perM", m.price_in, m.price_out) : "");
+  const tags = [price, m.context ? tr("model.ctx", Math.round(m.context/1000)) : ""]
                .filter(Boolean).join(" · ");
   return `<div class="tool" style="display:flex;align-items:center;gap:8px;padding:6px 8px">
-    <a class="pinstar ${isPinned?"on":""}" title="${isPinned?"pinned to Your models — click to remove":"pin to Your models (shows in chat switcher)"}"
+    <a class="pinstar ${isPinned?"on":""}" title="${esc(isPinned?tr("model.pinned"):tr("model.pin"))}"
        onclick="pinModel('${esc(st.provider)}','${esc(m.id)}','${isPinned?"unpin":"pin"}')">${isPinned?"★":"☆"}</a>
     <code style="flex:1;word-break:break-all">${esc(m.id)}</code>
     <span class="meta" style="margin:0;white-space:nowrap">${esc(tags)}</span>
-    ${m.reasoning ? `<span class="srcpill apple" title="thinks out loud before answering: fine for the loop, a poor fit for the gate's tiny token budget">reasoning</span>` : ""}
-    ${curGate ? `<span class="srcpill">GATE</span>`
-              : `<a class="reveal" data-id="${esc(m.id)}" onclick="switchModel(this.dataset.id,true)" title="use as the gate/summary model">gate</a>`}
-    ${cur ? `<span class="srcpill" style="background:var(--good-soft);color:var(--good)">CURRENT</span>`
-          : (m.tools === false ? `<span class="meta" style="margin:0" title="the loop needs tool calling">chat-only</span>`
-                               : `<button class="save" data-id="${esc(m.id)}" onclick="switchModel(this.dataset.id)">use</button>`)}
+    ${m.reasoning ? `<span class="srcpill apple" title="${esc(tr("model.reasoningHint"))}">${esc(tr("model.reasoning"))}</span>` : ""}
+    ${curGate ? `<span class="srcpill">${esc(tr("model.gatePill"))}</span>`
+              : `<a class="reveal" data-id="${esc(m.id)}" onclick="switchModel(this.dataset.id,true)" title="${esc(tr("model.useAsGate"))}">${esc(tr("model.gate"))}</a>`}
+    ${cur ? `<span class="srcpill" style="background:var(--good-soft);color:var(--good)">${esc(tr("model.currentPill"))}</span>`
+          : (m.tools === false ? `<span class="meta" style="margin:0" title="${esc(tr("model.needsTools"))}">${esc(tr("model.chatOnly"))}</span>`
+                               : `<button class="save" data-id="${esc(m.id)}" onclick="switchModel(this.dataset.id)">${esc(tr("model.use"))}</button>`)}
   </div>`;
 }
 
@@ -95,12 +95,12 @@ function renderCatalog(){
   box.style.display = ""; if (head) head.style.display = "";
   box.innerHTML = `
     <div class="cat-controls">
-      <input id="cat-q" type="text" placeholder="filter models…" value="${esc(catFilter.q)}"
+      <input id="cat-q" type="text" placeholder="${esc(tr("prov.filterModels"))}" value="${esc(catFilter.q)}"
         onfocus="markEditing()" oninput="catFilter.q=this.value;renderCatalogList()">
       <label class="meta" style="margin:0"><input type="checkbox" id="cat-free" ${catFilter.free?"checked":""}
-        onchange="catFilter.free=this.checked;renderCatalogList()"> free only</label>
+        onchange="catFilter.free=this.checked;renderCatalogList()"> ${esc(tr("model.freeOnly"))}</label>
       <label class="meta" style="margin:0"><input type="checkbox" id="cat-tools" ${catFilter.tools?"checked":""}
-        onchange="catFilter.tools=this.checked;renderCatalogList()"> tool-capable only</label>
+        onchange="catFilter.tools=this.checked;renderCatalogList()"> ${esc(tr("model.toolsOnly"))}</label>
     </div>
     <div id="cat-list"></div>
     <div class="meta" id="free-switch-msg" style="margin-top:6px"></div>`;
@@ -118,21 +118,21 @@ function renderCatalogList(){
                              && (!catFilter.tools || m.tools));
   let h = "";
   if (!q && !catFilter.free && !catFilter.tools){
-    h += `<div class="meta" style="margin:4px 0">Suggested picks: transparent heuristics from catalog metadata (tools, price, context), not a quality leaderboard</div>`;
-    h += `<div class="meta" style="margin:6px 0 2px"><b>For the loop</b> (needs tool calling; free first, biggest context)</div>`;
+    h += `<div class="meta" style="margin:4px 0">${esc(tr("model.suggested"))}</div>`;
+    h += `<div class="meta" style="margin:6px 0 2px">${tr("model.forLoop")}</div>`;
     h += loopPicks(all).map(m => modelRow(m, st)).join("");
-    h += `<div class="meta" style="margin:10px 0 2px"><b>For the gate</b> (cheap, terse, non-reasoning)</div>`;
+    h += `<div class="meta" style="margin:10px 0 2px">${tr("model.forGate")}</div>`;
     h += gatePicks(all).map(m => modelRow(m, st)).join("");
-    h += `<div class="meta" style="margin:12px 0 2px"><b>Everything</b> (${all.length} models, by vendor)</div>`;
+    h += `<div class="meta" style="margin:12px 0 2px">${tr("model.everything", all.length)}</div>`;
   } else {
-    h += `<div class="meta" style="margin:4px 0">${shown.length} of ${all.length} models</div>`;
+    h += `<div class="meta" style="margin:4px 0">${esc(tr("model.shownOf", shown.length, all.length))}</div>`;
   }
   const vendors = {};
   shown.forEach(m => (vendors[m.id.split("/")[0]] ??= []).push(m));
   const expand = q || catFilter.free || catFilter.tools;
   h += Object.keys(vendors).sort().map(v => `
     <details ${expand ? "open" : ""}><summary><code>${esc(v)}</code>
-      <span class="meta" style="margin-left:6px">${vendors[v].length}${vendors[v].some(m=>m.free) ? " · has free" : ""}</span></summary>
+      <span class="meta" style="margin-left:6px">${vendors[v].length}${vendors[v].some(m=>m.free) ? esc(tr("model.hasFree")) : ""}</span></summary>
       ${vendors[v].map(m => modelRow(m, st)).join("")}
     </details>`).join("");
   list.innerHTML = h;
@@ -144,13 +144,13 @@ function renderCatalogList(){
 async function switchModel(id, asGate){
   const st = (D && D.settings) || {};
   const msg = document.getElementById("free-switch-msg");
-  if (msg) msg.textContent = "switching…";
+  if (msg) msg.textContent = tr("set.switching");
   const payload = {provider: st.provider,
     model: asGate ? st.model : id, small_model: asGate ? id : st.small_model};
   const r = await postJSON("/api/providers", payload);
   if (!r.error){ editing = false; modelCatalog = null; await refresh(); }
-  if (msg) msg.textContent = r.error ? ("Error: " + r.error)
-                                     : (asGate ? "Gate model is now " : "Model is now ") + id + ". Applies from your next message.";
+  if (msg) msg.textContent = r.error ? tr("atom.error", r.error)
+                                     : (asGate ? tr("model.gateNow") : tr("model.modelNow")) + id + tr("model.appliesNext");
 }
 
 // "Your models" — the curated shortlist the chat pill shows, spanning every
@@ -163,10 +163,10 @@ function yourModelsCard(st){
     <div class="pinrow ${(p.provider===st.provider && p.model===st.model)?"on":""}">
       <span class="mm-prov">${esc(p.provider)}</span>
       <code style="flex:1;word-break:break-all">${esc(p.model)}</code>
-      ${p.default ? `<span class="srcpill" title="this provider's default model">default</span>`
-                  : `<a class="reveal" onclick="pinModel('${esc(p.provider)}','${esc(p.model)}','default')" title="make this ${esc(p.provider)}'s default">make default</a>`}
-      <a class="reveal" onclick="pinModel('${esc(p.provider)}','${esc(p.model)}','unpin')" title="remove from your list">remove</a>
-    </div>`).join("") || `<div class="meta">No models pinned yet — add one below.</div>`;
+      ${p.default ? `<span class="srcpill" title="${esc(tr("your.isDefault"))}">${esc(tr("dock.default"))}</span>`
+                  : `<a class="reveal" onclick="pinModel('${esc(p.provider)}','${esc(p.model)}','default')" title="${esc(tr("your.makeDefaultT", p.provider))}">${esc(tr("your.makeDefault"))}</a>`}
+      <a class="reveal" onclick="pinModel('${esc(p.provider)}','${esc(p.model)}','unpin')" title="${esc(tr("your.removeT"))}">${esc(tr("your.remove"))}</a>
+    </div>`).join("") || `<div class="meta">${esc(tr("your.empty"))}</div>`;
   // The add row is self-contained: pick any provider + type/choose a model id,
   // then Add. Works even for providers with no live catalog. The datalist
   // suggests the CURRENT provider's models (the only one we've fetched).
@@ -174,15 +174,15 @@ function yourModelsCard(st){
   // Populate the model <select> for the initially-selected provider once the
   // card is in the DOM (a fresh fetch of that provider's catalog).
   setTimeout(() => loadAddModels(st.provider), 0);
-  return `<h2>Your models <span class="meta" style="font-weight:400">— what the chat switcher shows</span></h2>
+  return `<h2>${esc(tr("your.title"))} <span class="meta" style="font-weight:400">${esc(tr("your.sub"))}</span></h2>
     <div class="card">
       ${rows}
       <div class="addmodel">
         <select id="add-prov" onfocus="markEditing()" onchange="loadAddModels(this.value)">${provOpts}</select>
-        <select id="add-model"><option value="">loading models…</option></select>
-        <button class="save" onclick="addPinnedModel()">Add</button>
+        <select id="add-model"><option value="">${esc(tr("your.loadingModels"))}</option></select>
+        <button class="save" onclick="addPinnedModel()">${esc(tr("your.add"))}</button>
       </div>
-      <div class="meta" style="margin-top:6px" id="add-msg">Pick a provider, choose a model, then Add.</div>
+      <div class="meta" style="margin-top:6px" id="add-msg">${esc(tr("your.pickThenAdd"))}</div>
     </div>`;
 }
 
@@ -192,21 +192,21 @@ async function loadAddModels(provider){
   const sel = document.getElementById("add-model");
   const msg = document.getElementById("add-msg");
   if (!sel) return;
-  sel.innerHTML = `<option value="">loading ${esc(provider)} models…</option>`;
+  sel.innerHTML = `<option value="">${esc(tr("your.loadingFor", provider))}</option>`;
   let data;
   try { data = await (await fetch("/api/models?provider=" + encodeURIComponent(provider))).json(); }
-  catch(e){ sel.innerHTML = `<option value="">couldn't load — pick another provider</option>`; return; }
+  catch(e){ sel.innerHTML = `<option value="">${esc(tr("your.loadFailed"))}</option>`; return; }
   const ms = data.models || [];
-  sel.innerHTML = `<option value="">choose a model…</option>` + ms.map(m => {
-    const meta = [m.free ? "free" : (m.price_out != null ? `$${m.price_in}/$${m.price_out}` : ""),
+  sel.innerHTML = `<option value="">${esc(tr("your.chooseModel"))}</option>` + ms.map(m => {
+    const meta = [m.free ? tr("model.free") : (m.price_out != null ? `$${m.price_in}/$${m.price_out}` : ""),
                   m.context ? Math.round(m.context/1000) + "k" : ""].filter(Boolean).join(" · ");
     return `<option value="${esc(m.id)}">${esc(m.id)}${meta ? "  ("+esc(meta)+")" : ""}</option>`;
   }).join("");
   if (msg) msg.innerHTML = data.listed
-    ? `${ms.length} models on <b>${esc(provider)}</b>. Choose one and Add — or star models in the catalog below.`
+    ? tr("your.listedFor", ms.length, esc(provider))
     : data.error
-      ? `Couldn't list <b>${esc(provider)}</b>: <span style="color:var(--bad)">${esc(data.error)}</span> — showing its defaults only.`
-      : `No live catalog for <b>${esc(provider)}</b> (only its defaults shown). Set its API key to list more.`;
+      ? tr("your.listFailed", esc(provider), esc(data.error))
+      : tr("your.noCatalog", esc(provider));
 }
 
 async function addPinnedModel(){
@@ -247,14 +247,14 @@ function providerCard(p, st){
   const current = p.key === st.provider;
   const dot = status === "enabled" ? "var(--good)" : status === "configured" ? "#4c9aff" : "var(--bad)";
   return `<div class="provcard" data-provider="${esc(p.key)}">
-    ${current ? `<span class="srcpill prov-current" style="background:var(--good-soft);color:var(--good)">current</span>` : ""}
+    ${current ? `<span class="srcpill prov-current" style="background:var(--good-soft);color:var(--good)">${esc(tr("prov.current"))}</span>` : ""}
     <img class="provlogo" src="/static/logos/${esc(p.key)}.svg" alt="" onerror="this.style.display='none'">
     <div class="provname">${esc(p.name)}</div>
-    <div class="provstatus"><span class="provdot" style="background:${dot}"></span>${status}</div>
+    <div class="provstatus"><span class="provdot" style="background:${dot}"></span>${esc(tr("prov." + status))}</div>
     <div class="provactions">
-      <button class="save ghost" onclick="openProviderModal('${esc(p.key)}')">edit</button>
-      ${status === "configured" ? `<button class="save ghost" onclick="toggleProvider('${esc(p.key)}',false)">enable</button>` : ""}
-      ${status === "enabled" && !current ? `<button class="save ghost" onclick="toggleProvider('${esc(p.key)}',true)">disable</button>` : ""}
+      <button class="save ghost" onclick="openProviderModal('${esc(p.key)}')">${esc(tr("prov.edit"))}</button>
+      ${status === "configured" ? `<button class="save ghost" onclick="toggleProvider('${esc(p.key)}',false)">${esc(tr("prov.enable"))}</button>` : ""}
+      ${status === "enabled" && !current ? `<button class="save ghost" onclick="toggleProvider('${esc(p.key)}',true)">${esc(tr("prov.disable"))}</button>` : ""}
     </div></div>`;
 }
 
@@ -262,7 +262,7 @@ function providerCard(p, st){
 // provider just leaves/enters the available list.
 async function toggleProvider(provider, disabled){
   const r = await postJSON("/api/providers", {provider, disabled});
-  if (!r.ok) alert(r.error || "update failed");
+  if (!r.ok) alert(r.error || tr("prov.updateFailed"));
   else { editing = false; await refresh(); }
 }
 
@@ -282,11 +282,11 @@ function openProviderModal(provider){
     <div class="provmodal${current ? " provmodal-models" : ""}" onclick="event.stopPropagation()">
       <div class="u" style="display:flex;justify-content:space-between;align-items:center">
         <b>${esc(p.name)}</b><a class="reveal" onclick="closeProviderModal()">✕</a></div>
-      <label class="fld"><span>API key <span class="meta">(${esc(f.name || "")})</span>
-        ${f.configured ? `<span class="srcpill" style="background:var(--good-soft);color:var(--good)">set ····${esc(f.last4 || "")}</span>`
-                       : `<span class="srcpill apple">not set</span>`}</span>
-        <input type="password" id="pm-key" placeholder="${f.configured ? "key on file — blank keeps it" : "paste key"}"></label>
-      ${baseField ? `<label class="fld"><span>Base URL <span class="meta">(select the API key's region)</span></span>
+      <label class="fld"><span>${esc(tr("prov.apiKey"))} <span class="meta">(${esc(f.name || "")})</span>
+        ${f.configured ? `<span class="srcpill" style="background:var(--good-soft);color:var(--good)">${esc(tr("prov.keySet", f.last4 || ""))}</span>`
+                       : `<span class="srcpill apple">${esc(tr("prov.keyNotSet"))}</span>`}</span>
+        <input type="password" id="pm-key" placeholder="${esc(f.configured ? tr("prov.keyOnFile") : tr("prov.pasteKey"))}"></label>
+      ${baseField ? `<label class="fld"><span>${esc(tr("prov.baseUrl"))} <span class="meta">${esc(tr("prov.baseUrlHint"))}</span></span>
         <select id="pm-base-url" onfocus="markEditing()">
           ${(baseField.options || []).map((url, index) => {
             const label = (baseField.option_labels || [])[index];
@@ -294,11 +294,11 @@ function openProviderModal(provider){
           }).join("")}
         </select></label>` : ""}
       ${current ? `
-      ${renderModelPicker("pm-model", "Main model (runs the loop; needs tool calling)", st.model || "")}
-      ${renderModelPicker("pm-small-model", "Gate / summary model", st.small_model || "")}` : ""}
+      ${renderModelPicker("pm-model", tr("prov.mainModel"), st.model || "")}
+      ${renderModelPicker("pm-small-model", tr("prov.gateModel"), st.small_model || "")}` : ""}
       <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="save" id="pm-save" onclick="saveProviderModal('${esc(provider)}')">Save</button>
-        ${!current ? `<button class="save ghost" id="pm-make-current" onclick="makeCurrentProvider('${esc(provider)}')">Set as current provider</button>` : ""}
+        <button class="save" id="pm-save" onclick="saveProviderModal('${esc(provider)}')">${esc(tr("set.save"))}</button>
+        ${!current ? `<button class="save ghost" id="pm-make-current" onclick="makeCurrentProvider('${esc(provider)}')">${esc(tr("prov.setCurrent"))}</button>` : ""}
       </div>
       <span class="meta" id="pm-msg"></span>
     </div></div>`;
@@ -315,7 +315,7 @@ function closeProviderModal(){
 // or its defaults when there is no catalog. Manual typing always still works.
 async function loadModalModels(provider){
   setupModelPickers([], provider);
-  setModelPickerMeta("Loading models…");
+  setModelPickerMeta(tr("prov.loadingModels"));
   let data;
   try {
     const response = await fetch("/api/models?provider=" + encodeURIComponent(provider));
@@ -327,10 +327,10 @@ async function loadModalModels(provider){
   setupModelPickers(data.models || [], provider);
   if (!data.listed){
     setModelPickerMeta(data.error && !(data.models || []).length
-      ? "Could not load catalog — you can still type any model id."
+      ? tr("prov.catalogFail")
       : data.error
-        ? "Could not load catalog — showing defaults only."
-      : "Live catalog unavailable — showing defaults.");
+        ? tr("prov.catalogDefault")
+      : tr("prov.catalogNone"));
   }
 }
 
@@ -348,10 +348,10 @@ function renderModelPicker(id, label, value){
     <div class="model-picker" id="${escAttr(id)}-picker">
       <div class="model-picker-input">
         <input type="text" id="${escAttr(id)}" value="${escAttr(value || "")}" autocomplete="off" onfocus="markEditing()" onclick="event.stopPropagation()">
-        <button type="button" class="model-picker-toggle" onclick="toggleModelPicker('${escAttr(id)}'); event.stopPropagation();" aria-label="toggle models" aria-controls="${escAttr(id)}-list" aria-expanded="false">▾</button>
+        <button type="button" class="model-picker-toggle" onclick="toggleModelPicker('${escAttr(id)}'); event.stopPropagation();" aria-label="${escAttr(tr("prov.toggleModels"))}" aria-controls="${escAttr(id)}-list" aria-expanded="false">▾</button>
       </div>
       <div class="model-picker-list" id="${escAttr(id)}-list" role="listbox">
-        <input type="text" class="model-picker-search" id="${escAttr(id)}-search" placeholder="filter models..." autocomplete="off" aria-label="filter models" oninput="filterModelPicker('${escAttr(id)}')" onfocus="markEditing()" onclick="event.stopPropagation()">
+        <input type="text" class="model-picker-search" id="${escAttr(id)}-search" placeholder="${escAttr(tr("prov.filterModels"))}" autocomplete="off" aria-label="${escAttr(tr("prov.filterModels"))}" oninput="filterModelPicker('${escAttr(id)}')" onfocus="markEditing()" onclick="event.stopPropagation()">
         <div class="model-picker-items" id="${escAttr(id)}-items"></div>
         <div class="model-picker-meta" id="${escAttr(id)}-meta" aria-live="polite"></div>
       </div>
@@ -444,8 +444,8 @@ function renderModelPickerItems(id, query){
   const filtered = _modalModels.filter(m => (m.id || "").toLowerCase().includes(query));
   itemsBox.innerHTML = filtered.map((m, index) => `<div class="model-picker-item${index === 0 ? " active" : ""}" role="option" data-model="${escAttr(m.id)}">${esc(m.id)}</div>`).join("");
   if (metaBox){
-    if (_modalModels.length === 0) metaBox.textContent = "No models loaded — you can still type any model id.";
-    else if (filtered.length === 0) metaBox.textContent = `No models match "${query}".`;
+    if (_modalModels.length === 0) metaBox.textContent = tr("prov.noModelsLoaded");
+    else if (filtered.length === 0) metaBox.textContent = tr("prov.noMatch", query);
     else metaBox.textContent = "";
   }
 }
@@ -475,13 +475,13 @@ function setProviderModalBusy(activeId, busy){
     if (!button.dataset.label) button.dataset.label = button.textContent;
     button.disabled = busy;
     button.textContent = busy && id === activeId
-      ? (id === "pm-make-current" ? "Switching…" : "Saving…")
+      ? (id === "pm-make-current" ? tr("prov.switchingP") : tr("prov.saving"))
       : button.dataset.label;
   });
   if (busy){
     const msg = document.getElementById("pm-msg");
     if (msg) msg.textContent = activeId === "pm-make-current"
-      ? "Switching provider…" : "Saving and validating changes…";
+      ? tr("prov.switchingMsg") : tr("prov.savingMsg");
   }
 }
 
@@ -493,7 +493,7 @@ async function submitProviderModal(provider, payload, activeId){
   if (!r.ok){
     setProviderModalBusy(activeId, false);
     const msg = document.getElementById("pm-msg");
-    if (msg) msg.textContent = r.error || "update failed";
+    if (msg) msg.textContent = r.error || tr("prov.updateFailed");
     return;
   }
   editing = false;

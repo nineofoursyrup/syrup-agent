@@ -65,15 +65,15 @@ function toggleSessMenu(ev){
   // "All messages" shows the full cross-thread timeline (like the Loop tab, but
   // as chat) — so your whole history is one scroll, not split across threads.
   const allItem = `<div class="sessitem allitem ${liveView==='__all__'?'on':''}" onclick="viewAllHistory()">
-      <div><b>All messages</b> — full timeline</div>
-      <div class="sm">every thread together, newest last</div></div>`;
+      <div>${tr("dock.allMessages")}</div>
+      <div class="sm">${esc(tr("dock.allMessagesSub"))}</div></div>`;
   menu.innerHTML = allItem + (sessions.length ? sessions.map(s => {
     const tags = gwTags(s);
     return `<div class="sessitem ${s.id===SESSION?"on":""}" onclick="openConversation('${esc(s.id)}')">
       <div>${esc(s.title||s.id)} ${tags}</div>
       <div class="sm">${sessionMeta(s)}</div>
     </div>`;
-  }).join("") : `<div class="sessitem">no past conversations yet</div>`);
+  }).join("") : `<div class="sessitem">${esc(tr("dock.noSessions"))}</div>`);
   const r = ev.currentTarget.getBoundingClientRect();
   menu.style.top = (r.bottom+6)+"px";
   menu.style.left = Math.max(8, r.right-300)+"px";
@@ -124,12 +124,12 @@ function toggleModelMenu(ev){
     `<div class="sessitem ${(p.provider===st.provider && p.model===st.model)?"on":""}"
           onclick="switchTo('${esc(p.provider)}','${esc(p.model)}')">
        <span class="mm-prov">${esc(p.provider)}</span> <span class="mm-id">${esc(p.model)}</span>${
-       p.default?'<span class="mm-def">default</span>':""}</div>`
-  ).join("") : `<div class="sessitem">No models pinned yet.</div>`;
+       p.default?`<span class="mm-def">${esc(tr("dock.default"))}</span>`:""}</div>`
+  ).join("") : `<div class="sessitem">${esc(tr("dock.noPinned"))}</div>`;
   const menu = document.createElement("div");
   menu.className = "sessmenu modelmenu"; menu.id = "modelmenu";
-  menu.innerHTML = `<div class="mm-h">Your models</div>${items}`
-    + `<div class="mm-f"><a href="#models" onclick="closeModelMenu()">+ add models in Models &rsaquo;</a></div>`;
+  menu.innerHTML = `<div class="mm-h">${esc(tr("dock.yourModels"))}</div>${items}`
+    + `<div class="mm-f"><a href="#models" onclick="closeModelMenu()">${esc(tr("dock.addModels"))}</a></div>`;
   const r = ev.currentTarget.getBoundingClientRect();
   menu.style.top = (r.bottom + 6) + "px";
   menu.style.left = Math.max(8, r.right - 250) + "px";
@@ -143,7 +143,7 @@ async function switchTo(provider, model){
   const chip = document.getElementById("modelchip");
   const name = chip && chip.querySelector(".mc-name");
   closeModelMenu();
-  if (name) name.textContent = "switching…";
+  if (name) name.textContent = tr("dock.switching");
   await postJSON("/api/providers", {provider, model,
     small_model: provider === st.provider ? st.small_model : ""});
   await refresh();

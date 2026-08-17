@@ -6,14 +6,14 @@ const money = n => "$" + (n < 0.01 ? n.toFixed(4) : n.toFixed(2));
 const secs = ms => ms==null ? "—" : (ms/1000).toFixed(1)+"s";
 
 const gateBadge = g => !g ? "" :
-  `<span class="badge ${g.decision==="retrieve"?"retrieve":""}">gate · ${esc(g.decision)}</span><span class="meta" style="margin:0">${esc(g.reason||"")}</span>`;
+  `<span class="badge ${g.decision==="retrieve"?"retrieve":""}">${esc(tr("atom.gateDecision", g.decision))}</span><span class="meta" style="margin:0">${esc(g.reason||"")}</span>`;
 
 // A tool call renders as a status row (dot + one-line summary); the raw output
 // hides behind a disclosure so an ugly osascript error never floods the page.
 const toolRow = x => `<div class="tool ${x.status||"ok"}">
   <div class="tool-head"><span class="dot ${x.status||"ok"}"></span><code>${esc(x.tool)}</code>
     ${x.summary?`<span style="color:var(--ink2)">${esc(x.summary)}</span>`:""}</div>
-  ${x.output!==undefined?`<details><summary>args &amp; raw output</summary>
+  ${x.output!==undefined?`<details><summary>${tr("atom.rawOutput")}</summary>
     <pre>${esc(x.tool)}(${esc(JSON.stringify(x.args,null,1))})\n\n${esc(x.output)}</pre>
   </details>`:""}
 </div>`;
@@ -36,17 +36,17 @@ const turnCard = t => `<div class="card">
   <div class="meta" style="margin-top:4px">${gateBadge(t.gate)}</div>
   ${(t.tools||[]).map(toolRow).join("")}
   <div class="r">${renderMarkdown(t.reply)}</div>
-  <div class="meta">${esc((t.ts||"").replace("T"," ").slice(0,19))} · ${secs(t.latency_ms)} · ${t.iterations??"?"} iter · ${money(t.cost||0)}${t.consolidation?` · consolidated ${t.consolidation.new_facts} fact(s)`:""}</div>
+  <div class="meta">${esc((t.ts||"").replace("T"," ").slice(0,19))} · ${secs(t.latency_ms)} · ${esc(tr("atom.iterN", t.iterations??"?"))} · ${money(t.cost||0)}${t.consolidation?` ${esc(tr("atom.consolidated", t.consolidation.new_facts))}`:""}</div>
 </div>`;
 
 const table = (heads, rows) => rows.length
   ? `<div class="card" style="padding:4px 8px"><table><tr>${heads.map(h=>`<th>${h}</th>`).join("")}</tr>${rows.join("")}</table></div>`
-  : `<div class="card empty">nothing here yet</div>`;
+  : `<div class="card empty">${esc(tr("atom.nothingHere"))}</div>`;
 
 const gateSplit = s => {
   if (!(s.gate_skips + s.gate_retrieves))
     return `<div class="splitbar"><div class="seg-skip" style="width:100%;opacity:.35"></div></div>
-      <div class="meta" style="margin-top:6px">no turns yet — send a message and the gate starts deciding</div>`;
+      <div class="meta" style="margin-top:6px">${esc(tr("gate.noTurns"))}</div>`;
   const tot = s.gate_skips + s.gate_retrieves;
   const skipPct = Math.round(s.gate_skips/tot*100), retPct = 100-skipPct;
   // only label a segment when it's wide enough to fit the text — otherwise a
@@ -54,9 +54,9 @@ const gateSplit = s => {
   const seg = (cls, n, label, pct) =>
     `<div class="${cls}" style="width:${pct}%">${pct>=14?`${n} ${label}`:""}</div>`;
   return `<div class="splitbar">
-    ${seg("seg-skip", s.gate_skips, "skipped", skipPct)}
-    ${seg("seg-ret", s.gate_retrieves, "retrieved", retPct)}
-  </div><div class="meta" style="margin-top:6px">the retrieval gate skipped memory on ${skipPct}% of turns — that's latency and bias saved</div>`;
+    ${seg("seg-skip", s.gate_skips, tr("gate.skipped"), skipPct)}
+    ${seg("seg-ret", s.gate_retrieves, tr("gate.retrieved"), retPct)}
+  </div><div class="meta" style="margin-top:6px">${esc(tr("gate.summary", skipPct))}</div>`;
 };
 
 // --- Chat gateway: type here, watch the harness run (turns kept in memory)
@@ -73,18 +73,18 @@ function stagesRow(t, live){
   // graph chip first — the front door. A quick graph turn has NO gate stage
   // (memory retrieval never ran), so the gate chip is honest and disappears.
   const graph = (t.graph && t.graph.route)
-    ? `<span class="stage done">graph · ${esc(t.graph.route)}</span>` : "";
+    ? `<span class="stage done">${esc(tr("atom.graphStage", t.graph.route))}</span>` : "";
   const gate = (t.graph && t.graph.route === "quick") ? ""
-    : `<span class="stage ${gateCls}">gate${t.gate?` · ${esc(t.gate.decision)}`:""}</span>`;
+    : `<span class="stage ${gateCls}">${esc(tr("atom.gateStage"))}${t.gate?` · ${esc(t.gate.decision)}`:""}</span>`;
   return `<div class="stages${live?"":" tele"}">`
-    + graph + gate + tools + `<span class="stage ${replyCls}">reply</span></div>`;
+    + graph + gate + tools + `<span class="stage ${replyCls}">${esc(tr("atom.replyStage"))}</span></div>`;
 }
 // The per-turn telemetry footer: seconds · iterations · model · consolidation.
-const teleFooter = t => `<div class="meta tele">${secs(t.latency_ms)} · ${t.iterations??"?"} iter${
-  t.model?` · ${esc(t.model)}`:""}${t.consolidation?` · consolidated ${t.consolidation.new_facts} fact(s)`:""}</div>`;
+const teleFooter = t => `<div class="meta tele">${secs(t.latency_ms)} · ${esc(tr("atom.iterN", t.iterations??"?"))}${
+  t.model?` · ${esc(t.model)}`:""}${t.consolidation?` ${esc(tr("atom.consolidated", t.consolidation.new_facts))}`:""}</div>`;
 
 const chatTurnCard = t => `<div class="card">
-  <button class="msg-copy" onclick="copyMsg(this)" data-text="${esc(t.reply)}" title="Copy reply">Copy</button>
+  <button class="msg-copy" onclick="copyMsg(this)" data-text="${esc(t.reply)}" title="${esc(tr("atom.copyReply"))}">${esc(tr("atom.copy"))}</button>
   ${(t.gate||t.graph)?`${stagesRow(t, false)}
     <div class="meta tele" style="margin:0 0 6px">${esc((t.gate&&t.gate.reason)||(t.graph&&t.graph.reason)||"")}</div>`:""}
   ${nodesRow(t)}
@@ -115,9 +115,9 @@ const streamingCard = m => `<div class="card">
   ${(m.tools||[]).map(toolRow).join("")}
   ${m.stream
      ? `<div class="r" style="margin-top:8px">${renderMarkdown(m.stream)}<span class="caret"></span></div>`
-     : `<div class="meta" style="margin:0">thinking&hellip;${m.started?` ${Math.round((Date.now()-m.started)/1000)}s`:""}${
+     : `<div class="meta" style="margin:0">${tr("atom.thinking")}${m.started?` ${Math.round((Date.now()-m.started)/1000)}s`:""}${
          m.started && Date.now()-m.started > 20000
-         ? `<br>still waiting: slow models (free tiers especially) can queue for a while; this errors out at the SYRUP_LLM_TIMEOUT limit instead of hanging forever`
+         ? `<br>${esc(tr("atom.stillWaiting"))}`
          : ""}</div>`}
 </div>`;
 
@@ -126,13 +126,13 @@ const streamingCard = m => `<div class="card">
 // "[tools used: ...]" annotation — strip both so the thread reads cleanly.
 const stripTools = t => (t || "").replace(/\s*\[tools used:[\s\S]*\]\s*$/, "").trim();
 const historicalCard = m => `<div class="card">
-  <button class="msg-copy" onclick="copyMsg(this)" data-text="${esc(stripTools(m.reply))}" title="Copy reply">Copy</button>
+  <button class="msg-copy" onclick="copyMsg(this)" data-text="${esc(stripTools(m.reply))}" title="${esc(tr("atom.copyReply"))}">${esc(tr("atom.copy"))}</button>
   <div class="r">${renderMarkdown(stripTools(m.reply))}</div>
 </div>`;
 
 function renderChatLog(){
   if (!CHAT.length)
-    return `<div class="empty" style="padding:6px 2px">Message Syrup here from any tab. Open Overview to watch it flow through the harness, or the Gateway tab to see every channel's messages together.</div>`;
+    return `<div class="empty" style="padding:6px 2px">${esc(tr("dock.empty"))}</div>`;
   return CHAT.map(m => m.role==="user"
       ? `<div class="bubble">${esc(m.text)}</div>`
       : m.pending ? streamingCard(m)
@@ -180,7 +180,7 @@ function applyStreamEvent(pending, ev){
     pending.stream = "";   // a new assistant turn begins after the tool result
   } else if (ev.kind === "done"){
     pending.pending = false; pending.stream = "";
-    if (ev.error) pending.reply = "Error: " + ev.error;
+    if (ev.error) pending.reply = tr("atom.error", ev.error);
     else Object.assign(pending, ev);   // reply, tools, gate, iterations, latency_ms, consolidation
   }
 }
@@ -213,7 +213,7 @@ async function sendChat(fromInput){
         syncChatLogs();
       }
     }
-  } catch(e){ Object.assign(pending, {pending:false, reply:"Error: "+e}); }
+  } catch(e){ Object.assign(pending, {pending:false, reply:tr("atom.error", e)}); }
   clearInterval(ticker);
   if (pending.pending) pending.pending = false;   // stream ended without a 'done'
   syncChatLogs();

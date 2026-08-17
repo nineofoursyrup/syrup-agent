@@ -8,15 +8,17 @@ let activeView = null, activeSub = null;
 // moved: after the Connections registry took keys, providers and integrations
 // out of that page, what remained was two switches that change how a turn runs,
 // which is a behaviour, not a setting.
-const TITLES = {chat:"Chat & watch", ops:"LLM Ops",
-                graph:"Graph workflows — structure around the loop",
-                // Covers both sub-tabs. TITLES is keyed by view, not by view+sub,
-                // so a models-only title sat above the Memory race and read as a
-                // mislabel; one honest sentence beats teaching the router about
-                // sub-tabs for a single page.
-                compare:"Arena — race models and memory through the same loop",
-                settings:"Behaviour — how a turn runs",
-                database:"Database — everything Syrup stores (state.db)"};
+//
+// Titles are SHORT NAMES now, and English in both languages: "Loop", "Memory",
+// "Graph" are this project's vocabulary (CONTEXT.md defines each). The sentence
+// that used to be welded onto the title — "Graph workflows — structure around
+// the loop" — moved to the subtitle, where it can be translated and where it
+// stops competing with the name for the same line.
+const TITLES = {ops:"LLM Ops", compare:"Arena", settings:"Behaviour"};
+const title = v => TITLES[v] || v[0].toUpperCase() + v.slice(1);
+// Absolute paths are correct and unreadable in a 208px column. Home-relative is
+// what a person calls the same file.
+const tilde = p => (p || "").replace(/^\/(?:Users|home)\/[^/]+\//, "~/");
 function render(){
   if (!D) return;
   const [v, subRaw] = (location.hash||"#overview").slice(1).split("/");
@@ -24,7 +26,9 @@ function render(){
   const view = VIEWS[v] ? v : "overview";
   const subChanged = sub !== activeSub || view !== activeView;
   document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on", a.dataset.v===view));
-  document.getElementById("title").textContent = TITLES[view] || view[0].toUpperCase()+view.slice(1);
+  document.getElementById("title").textContent = title(view);
+  document.getElementById("eyebrow").textContent = tr("page." + view + ".eyebrow");
+  document.getElementById("sub").textContent = tr("page." + view + ".sub");
   if (view === "overview" || view === "graph"){
     // don't rebuild mid-animation or the glowing SVG gets wiped
     if (activeView !== view || !animating){ document.getElementById("view").innerHTML = VIEWS[view](D); }
@@ -42,7 +46,16 @@ function render(){
     if (keepScroll) main.scrollTop = y;
   }
   activeView = view; activeSub = sub;
+  // --- the sidebar's identity block + footer. The host comes from the browser
+  // rather than the server: whatever address you actually reached this page on
+  // is the true answer, including a forwarded port.
   document.getElementById("model").textContent = `${D.provider} · ${D.model}`;
+  document.getElementById("ver").textContent = `v${D.version || "dev"} · ${tr("chrome.local")}`;
+  document.getElementById("host").textContent = location.host;
+  const db = D.db || {};
+  document.getElementById("navfiles").innerHTML =
+    `${esc(tilde(db.path || ""))} · ${((db.size || 0)/1024/1024).toFixed(1)} MB<br>` +
+    (D.trace_file ? `traces/${esc(D.trace_file)}` : esc(tr("chrome.tracesNone")));
   document.getElementById("n-gw").textContent = (D.chat_log||[]).length;
   document.getElementById("n-loop").textContent = D.stats.turns;
   document.getElementById("n-graph").textContent =
@@ -54,11 +67,17 @@ function render(){
 }
 let lastFetch = Date.now();
 let lastCompareLoad = 0;   // throttle the Compare scoreboard self-heal to ~5s
+// The liveness pill: is it up, how many turns has it answered, how fresh is
+// what you're looking at. It used to live in the subtitle, which meant the one
+// line that could explain a page was spent on a clock instead.
 function tickLive(){
   if (!D) return;
   const ago = Math.round((Date.now()-lastFetch)/1000);
-  document.getElementById("sub").innerHTML =
-    `<span class="live"><span class="dot"></span>live</span> · updated ${ago}s ago · ${esc(D.home)}`;
+  const turns = D.stats.turns;
+  document.getElementById("livepill").innerHTML =
+    `<span class="livedot"></span>${esc(tr("chrome.live"))} · ` +
+    `${esc(turns ? tr("chrome.turnN", turns) : tr("chrome.noTurnsYet"))} · ` +
+    `${esc(tr("chrome.updatedAgo", ago))}`;
 }
 let dockRestored = false;
 async function restoreDock(){
@@ -131,13 +150,13 @@ function wireChrome(){
 // ("transcription failed [Errno …]"). WAV is trivially decodable server-side.
 let micCtx = null, micStream = null, micNode = null, micBuf = [], micOn = false;
 const micHint = (msg) => { const i = document.getElementById("dmsg");
-  if (i){ i.placeholder = msg; setTimeout(()=>{ i.placeholder = "Message Syrup…"; }, 8000); } };
+  if (i){ i.placeholder = msg; setTimeout(()=>{ i.placeholder = tr("dock.placeholder"); }, 8000); } };
 
 async function toggleMic(){
   const btn = document.getElementById("mic");
   if (micOn){ await stopMic(); return; }
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-    micHint("voice needs a normal browser tab at localhost:9049 — not the IDE preview pane");
+    micHint(tr("voice.needsTab"));
     return;
   }
   try {
@@ -151,9 +170,8 @@ async function toggleMic(){
     micOn = true; btn.classList.add("rec");
   } catch(e){
     console.warn("mic error:", e);
-    micHint(e && e.name === "NotAllowedError"
-      ? "mic blocked — click the lock icon in the address bar → allow Microphone → reload (macOS: also System Settings ▸ Privacy ▸ Microphone ▸ your browser)"
-      : "mic unavailable: " + (e && e.message || e));
+    micHint(e && e.name === "NotAllowedError" ? tr("voice.blocked")
+                                              : tr("voice.unavailable", (e && e.message) || e));
   }
 }
 
@@ -165,11 +183,11 @@ async function stopMic(){
   const rate = micCtx.sampleRate;
   micCtx.close();
   const wav = encodeWAV(micBuf, rate);
-  const hold = input.placeholder; input.placeholder = "transcribing…";
+  const hold = input.placeholder; input.placeholder = tr("voice.transcribing");
   let r; try { r = await (await fetch("/api/voice", {method:"POST", body:wav})).json(); }
   catch(e){ r = {error:String(e)}; }
   input.placeholder = hold;
-  if (r.error){ input.value = ""; micHint("voice: " + r.error); return; }
+  if (r.error){ input.value = ""; micHint(tr("voice.error", r.error)); return; }
   if (r.text){ input.value = r.text; input.focus(); }
 }
 
@@ -190,6 +208,10 @@ function wireMic(){ const b = document.getElementById("mic"); if (b) b.onclick =
 
 window.addEventListener("hashchange", render);
 window.__hold = (v)=>{ animating = v; };   // test hook: freeze the diagram
+// Translate the static shell BEFORE the first paint, so the page never flashes
+// its markup defaults on the way to the saved language.
+applyStaticI18n();
+document.documentElement.lang = LANG === "en" ? "en" : "zh-CN";
 wireDock(); wireChrome(); wireMic();
 refresh(); setInterval(refresh, 5000); setInterval(tickLive, 1000);
 pollEvents(); setInterval(pollEvents, 450);   // live harness animation
