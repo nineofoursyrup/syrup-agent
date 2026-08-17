@@ -1,0 +1,18 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "syrup-dashboard",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "syrup.ops.dashboard"],
+      "port": 9049,
+      "autoPort": false
+    },
+    {
+      "name": "phoenix-traces",
+      "runtimeExecutable": ".venv/bin/python",
+      "runtimeArgs": ["-m", "phoenix.server.main", "serve"],
+      "port": 6006
+    }
+  ]
+}

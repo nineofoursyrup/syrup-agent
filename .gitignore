@@ -1,0 +1,52 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+state.db
+traces/
+*.ics
+# The rest of a home's runtime artifacts, matched by FILENAME rather than by
+# the home's name. The `.syrup*/` rules below only cover homes we can name;
+# one restored from a backup or pointed somewhere unexpected by SYRUP_HOME
+# matches none of them, and its SOUL.md is exactly what you least want
+# pushed. Keying on the artifact makes the guard independent of what the
+# directory happens to be called — including names that do not exist yet.
+SOUL.md
+usage.jsonl
+outbox/
+.DS_Store
+dist/
+.pytest_cache/
+.ruff_cache/
+# syrup is an installable package with loose, deliberate dependency bounds
+# (anthropic>=0.40, ...) and 14 optional extras. A lockfile would pin the whole
+# resolved universe — including the arena extra's mem0ai/langgraph/zep — and
+# need re-locking on every dependency touch, for a package whose install path
+# is `uv pip install -e .` rather than `uv sync`. uv regenerates it locally
+# whenever it wants one; it does not belong in the repo.
+uv.lock
+.syrup/
+.syrup.bak-*/
+# Any ALTERNATE agent home, not just the default one. DISCORD_HOME gives the
+# bot its own memory (see syrup/gateway/discord.py); SYRUP_HOME can point anywhere.
+# Without this glob only `.syrup/` was covered, so a second home's SOUL.md,
+# usage.jsonl and outbox/ were tracked — the exact files you least want pushed.
+.syrup-*/
+
+# Delegated coding deliverables (dated run folders + auto-run logs)
+syrup_workspace/
+
+# Scratch git worktrees the coding harness creates when it runs an agent in
+# isolation — a full checkout plus its own .venv, so ~150M each. They recur
+# every time an isolated agent runs and are disposable by construction: the
+# work lands on a branch, not in the tree. Scoped to this one subdirectory,
+# NOT all of .claude/ — launch.json and skills/ are tracked on purpose.
+.claude/worktrees/
+
+# Google OAuth: the client file you download from Cloud Console, and any token
+# it produces. Nothing here should ever be committed — belt and braces, because
+# the docs used to tell people to drop credentials.json in the repo root.
+credentials.json
+client_secret*.json
+*token*.json
+.gcp/

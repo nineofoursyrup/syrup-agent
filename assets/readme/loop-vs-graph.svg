@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="460" viewBox="0 0 1200 460"
+     role="img" aria-labelledby="lvg-title lvg-desc">
+  <title id="lvg-title">The loop versus a graph workflow</title>
+  <desc id="lvg-desc">Left: the loop is one path — think, act, observe, repeat until it can answer. Right: a graph workflow is a map of steps — a small model classifies the message while the calendar loads in parallel, then a route sends a throwaway message to a quick small-model reply and real work into the full agent, which is the same loop running as one node.</desc>
+
+  <defs>
+    <clipPath id="lvg-clip"><rect width="1200" height="460" rx="22"/></clipPath>
+    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#6b6a73"/>
+    </marker>
+  </defs>
+
+  <g clip-path="url(#lvg-clip)">
+    <rect width="1200" height="460" fill="#101012"/>
+    <rect width="1200" height="460" fill="none" stroke="#1c1c1f" stroke-width="1"/>
+  </g>
+
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+
+    <text x="48" y="48" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="14" letter-spacing="3" fill="#5f5e66">TWO WAYS TO RUN A TURN</text>
+
+    <!-- ============ LEFT — the loop ============ -->
+    <rect x="48" y="76" width="496" height="340" rx="14" fill="#141416" stroke="#26262b"/>
+    <text x="76" y="112" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="14" letter-spacing="2" fill="#7c8aec">THE LOOP</text>
+    <text x="76" y="134" font-size="12.5" fill="#8d8c96">one path, the same three steps, over and over</text>
+
+    <rect x="186" y="150" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="296" y="172" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="13.5" letter-spacing="1.5" fill="#ececea">THINK</text>
+    <text x="296" y="190" text-anchor="middle" font-size="11.5" fill="#8d8c96">what should I do next?</text>
+
+    <rect x="186" y="228" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="296" y="250" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="13.5" letter-spacing="1.5" fill="#ececea">ACT</text>
+    <text x="296" y="268" text-anchor="middle" font-size="11.5" fill="#8d8c96">call one tool</text>
+
+    <rect x="186" y="304" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="296" y="326" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="13.5" letter-spacing="1.5" fill="#ececea">OBSERVE</text>
+    <text x="296" y="344" text-anchor="middle" font-size="11.5" fill="#8d8c96">read what came back</text>
+
+    <path d="M 296 202 V 222" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
+    <path d="M 296 280 V 298" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
+    <path d="M 186 330 H 132 V 176 H 180" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <text x="124" y="253" text-anchor="middle" font-size="11" fill="#8d8c96"
+          transform="rotate(-90 124 253)">until it can answer</text>
+
+    <text x="76" y="392" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="11" fill="#5f5e66">syrup/loop/agent.py &#8212; the model picks tools until it stops</text>
+
+    <!-- ============ RIGHT — a graph workflow ============ -->
+    <rect x="576" y="76" width="576" height="340" rx="14" fill="#141416" stroke="#26262b"/>
+    <text x="604" y="112" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="14" letter-spacing="2" fill="#e0a458">A GRAPH WORKFLOW</text>
+    <text x="604" y="134" font-size="12.5" fill="#8d8c96">a map of steps: some run side by side, one edge decides where next</text>
+
+    <rect x="604" y="176" width="72" height="36" rx="18" fill="#1e1e22" stroke="#2c2c31"/>
+    <text x="640" y="199" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12" letter-spacing="1" fill="#d8d7de">START</text>
+
+    <rect x="708" y="150" width="196" height="44" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="724" y="170" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12.5" letter-spacing="1" fill="#ececea">CLASSIFY</text>
+    <text x="724" y="186" font-size="11.5" fill="#8d8c96">a small model reads the message</text>
+
+    <rect x="708" y="206" width="196" height="44" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="724" y="226" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12.5" letter-spacing="1" fill="#ececea">CHECK CALENDAR</text>
+    <text x="724" y="242" font-size="11.5" fill="#8d8c96">a local read, at the same time</text>
+
+    <rect x="944" y="176" width="110" height="44" rx="22" fill="#1e1e22" stroke="#333338"/>
+    <text x="999" y="203" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12.5" letter-spacing="1.5" fill="#ececea">ROUTE</text>
+
+    <rect x="708" y="300" width="196" height="56" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="724" y="322" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12.5" letter-spacing="1" fill="#ececea">QUICK REPLY</text>
+    <text x="724" y="340" font-size="11.5" fill="#8d8c96">small model answers; the big</text>
+    <text x="724" y="352" font-size="11.5" fill="#8d8c96">one never wakes up</text>
+
+    <rect x="944" y="300" width="196" height="56" rx="10" fill="#18181b" stroke="#2c2c31"/>
+    <text x="960" y="322" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="12.5" letter-spacing="1" fill="#7c8aec">FULL AGENT</text>
+    <text x="960" y="340" font-size="11.5" fill="#8d8c96">the loop on the left, running</text>
+    <text x="960" y="352" font-size="11.5" fill="#8d8c96">as one node of this map</text>
+
+    <path d="M 676 194 H 692 V 172 H 702" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <path d="M 676 194 H 692 V 228 H 702" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <path d="M 904 172 H 926 V 190 H 938" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <path d="M 904 228 H 926 V 206 H 938" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <path d="M 999 220 V 268 H 806 V 294" stroke="#6b6a73" stroke-width="1.4" fill="none"
+          marker-end="url(#ar2)"/>
+    <path d="M 1042 220 V 294" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
+    <text x="818" y="264" font-size="11" fill="#8d8c96">&#8220;thanks!&#8221;</text>
+    <text x="1032" y="263" text-anchor="end" font-size="11" fill="#8d8c96">&#8220;schedule a swim Saturday&#8221;</text>
+
+    <text x="604" y="392" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="11" fill="#5f5e66">syrup/graph/ &#8212; anything that goes wrong falls back to the plain loop</text>
+  </g>
+</svg>
