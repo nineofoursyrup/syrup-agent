@@ -1,75 +1,193 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="1200" height="364" viewBox="0 0 1200 364"
+     width="1200" height="1170" viewBox="0 0 1200 1170"
      role="img" aria-labelledby="hero-title hero-desc">
-  <title id="hero-title">syrup-agent</title>
-  <desc id="hero-desc">A local-first AI assistant built on four pillars — Harness, Loop, Memory, Eval/LLM-Ops — with a live terminal transcript of its retrieval gate deciding skip vs. retrieve.</desc>
+  <title id="hero-title">Syrup —— 一个跑在你自己机器上的私人 AI 助手</title>
+  <desc id="hero-desc">Dashboard 首页上那张实时架构图。一条消息从 Gateway 进来，Working memory 为这一轮重新组装，Loop 里模型推理、调 Tools、看结果，回复从进来的那扇门回去。左下角是 Procedural / Semantic / Episodic 三根 Memory 支柱和读它们的 Retrieval gate，Retrieval gate 只在需要时把记忆送进 Working memory；每 6 轮一次的 Consolidation 把对话沉淀成事实。右边是离线的 LLM Ops 闭环：Trace、Eval、Release gate、Release —— 放行之后的新提示词和配置就是下一轮跑的东西。</desc>
 
   <defs>
-    <clipPath id="hero-clip"><rect width="1200" height="364" rx="22"/></clipPath>
+    <clipPath id="hero-clip"><rect width="1200" height="1170" rx="20"/></clipPath>
+    <marker id="hr-arrow" viewBox="0 0 10 10" refX="8.5" refY="5"
+            markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#8f8e89"/>
+    </marker>
+    <marker id="hr-arrow-dash" viewBox="0 0 10 10" refX="8.5" refY="5"
+            markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#b3b2ad"/>
+    </marker>
   </defs>
 
   <g clip-path="url(#hero-clip)">
-    <rect width="1200" height="364" fill="#101012"/>
-    <rect width="1200" height="364" fill="none" stroke="#1c1c1f" stroke-width="1"/>
+    <rect width="1200" height="1170" fill="#fafaf9"/>
+    <rect x="0.5" y="0.5" width="1199" height="1169" rx="20" fill="none" stroke="#e7e6e4"/>
   </g>
 
-  <!-- ============ LEFT: identity ============ -->
-  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
-    <text x="56" y="60" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="18" letter-spacing="3" fill="#8d8c96">LOCAL-FIRST AI ASSISTANT</text>
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
 
-    <text x="56" y="122" font-size="54" font-weight="700" fill="#ececea">syrup-agent</text>
+    <!-- ==================== 标题带 ==================== -->
+    <text x="48" y="74" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="3" fill="#a3a29d">LOCAL-FIRST · HARNESS · LOOP · MEMORY · LLM OPS</text>
+    <text x="48" y="150" font-size="60" font-weight="700" fill="#21201d">Syrup</text>
+    <text x="252" y="126" font-size="25" fill="#21201d">一个跑在你自己机器上的私人 AI 助手 ——</text>
+    <text x="252" y="160" font-size="25" fill="#6f6e69">也是一份小到一个下午就能读完的 agent 蓝图。</text>
+    <path d="M 48 190 H 1152" stroke="#e7e6e4" stroke-width="1"/>
 
-    <text x="56" y="164" font-size="22" fill="#a9a8b3">Your own personal AI assistant —</text>
-    <text x="56" y="194" font-size="22" fill="#a9a8b3">in code you can read in an afternoon.</text>
+    <!-- ==================== HARNESS ==================== -->
+    <text x="48" y="220" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="2.5" fill="#a3a29d">HARNESS</text>
+    <text x="151" y="220" font-size="17" fill="#a3a29d">—— 跑在你自己的笔记本上 · 里面那一轮转完就没了</text>
+    <rect x="48" y="234" width="800" height="878" rx="18" fill="none"
+          stroke="#d9d8d5" stroke-width="1.2" stroke-dasharray="6 6"/>
 
-    <!-- pillar chips: the four boxes from the architecture diagram -->
-    <g font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="18" text-anchor="middle">
-      <rect x="56" y="232" width="112" height="34" rx="8" fill="#18181b" stroke="#2c2c31"/>
-      <text x="112" y="255" fill="#d8d7de">HARNESS</text>
+    <!-- 回复从进来的那扇门出去 -->
+    <text x="500" y="272" text-anchor="middle" font-size="18" fill="#a3a29d">回复从进来的那扇 Gateway 出去</text>
+    <path d="M 820 606 H 832 V 282 H 169 V 376" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#hr-arrow)"/>
 
-      <text x="186" y="255" fill="#45454b" text-anchor="middle" font-size="16">&#8250;</text>
+    <!-- 这一轮 -->
+    <!-- gateway -->
+    <rect x="78" y="382" width="182" height="96" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="100" y="422" font-size="22" font-weight="600" fill="#21201d">Gateway</text>
+    <text x="100" y="450" font-size="18" fill="#6f6e69">cli · voice · web</text>
 
-      <rect x="204" y="232" width="78" height="34" rx="8" fill="#18181b" stroke="#2c2c31"/>
-      <text x="243" y="255" fill="#d8d7de">LOOP</text>
+    <path d="M 260 430 H 286" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
 
-      <text x="300" y="255" fill="#45454b" text-anchor="middle" font-size="16">&#8250;</text>
+    <!-- working memory -->
+    <rect x="292" y="382" width="222" height="96" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="314" y="422" font-size="22" font-weight="600" fill="#21201d">Working memory</text>
+    <text x="314" y="450" font-size="18" fill="#6f6e69">每一轮重新组装</text>
 
-      <rect x="318" y="232" width="104" height="34" rx="8" fill="#18181b" stroke="#2c2c31"/>
-      <text x="370" y="255" fill="#d8d7de">MEMORY</text>
+    <path d="M 514 430 H 540" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
 
-      <text x="440" y="255" fill="#45454b" text-anchor="middle" font-size="16">&#8250;</text>
+    <!-- the loop -->
+    <text x="680" y="304" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="3" fill="#5e6ad2">LOOP</text>
+    <rect x="546" y="316" width="268" height="228" rx="14" fill="#ffffff"
+          stroke="#5e6ad2" stroke-width="1.6"/>
 
-      <rect x="458" y="232" width="142" height="34" rx="8" fill="#18181b" stroke="#2c2c31"/>
-      <text x="529" y="255" fill="#d8d7de">EVAL / OPS</text>
-    </g>
+    <rect x="568" y="340" width="224" height="76" rx="10" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="590" y="374" font-size="22" font-weight="600" fill="#21201d">LLM agent</text>
+    <text x="590" y="400" font-size="18" fill="#6f6e69">推理</text>
 
-    <!-- first command, verbatim from Quickstart -->
-    <text x="56" y="326" font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="20">
-      <tspan fill="#5f5e66">$ </tspan><tspan fill="#ececea">uv run syrup</tspan>
-    </text>
-    <rect x="234" y="310" width="11" height="20" fill="#5f5e66"/>
+    <path d="M 622 418 V 448" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+    <text x="636" y="440" font-size="18" fill="#a3a29d">执行</text>
+    <text x="724" y="440" text-anchor="end" font-size="18" fill="#a3a29d">观察</text>
+    <path d="M 738 448 V 418" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+
+    <rect x="568" y="452" width="224" height="76" rx="10" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="590" y="486" font-size="22" font-weight="600" fill="#21201d">Tools</text>
+    <text x="590" y="512" font-size="18" fill="#6f6e69">create_event…</text>
+
+    <!-- reply -->
+    <path d="M 708 544 V 590" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+    <text x="722" y="572" font-size="18" fill="#a3a29d">回复</text>
+    <rect x="596" y="596" width="224" height="96" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="618" y="636" font-size="22" font-weight="600" fill="#21201d">Reply</text>
+    <text x="618" y="664" font-size="18" fill="#6f6e69">→ 回到你手里</text>
+
+    <!-- 检索闸门 -->
+    <path d="M 403 546 V 484" fill="none" stroke="#c2c1bc" stroke-width="1.4"
+          stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+    <text x="417" y="518" font-size="18" fill="#a3a29d">只在需要时</text>
+
+    <path d="M 403 546 L 551 620 L 403 694 L 255 620 Z" fill="#ffffff"
+          stroke="#5e6ad2" stroke-width="1.6"/>
+    <text x="403" y="614" text-anchor="middle" font-size="22" font-weight="600" fill="#21201d">Retrieval gate</text>
+    <text x="403" y="642" text-anchor="middle" font-size="18" fill="#6f6e69">18 跳过 · 17 检索</text>
+
+    <!-- 三根记忆支柱 -->
+    <text x="78" y="726" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="2.5" fill="#a3a29d">MEMORY</text>
+    <text x="169" y="726" font-size="17" fill="#a3a29d">—— 三根支柱，Retrieval gate 读的就是这三种</text>
+    <rect x="78" y="740" width="690" height="204" rx="16" fill="#f3f2f0" stroke="#e7e6e4"/>
+
+    <rect x="102" y="784" width="198" height="118" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="124" y="820" font-size="22" font-weight="600" fill="#21201d">Procedural</text>
+    <text x="124" y="848" font-size="18" fill="#6f6e69">怎么做</text>
+    <text x="124" y="874" font-size="18" fill="#a3a29d">3 个 Skill</text>
+
+    <rect x="324" y="784" width="198" height="118" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="346" y="820" font-size="22" font-weight="600" fill="#21201d">Semantic</text>
+    <text x="346" y="848" font-size="18" fill="#6f6e69">什么是真的</text>
+    <text x="346" y="874" font-size="18" fill="#a3a29d">3 条事实</text>
+
+    <rect x="546" y="784" width="198" height="118" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="568" y="820" font-size="22" font-weight="600" fill="#21201d">Episodic</text>
+    <text x="568" y="848" font-size="18" fill="#6f6e69">发生过什么</text>
+    <text x="568" y="874" font-size="18" fill="#a3a29d">6 条情节</text>
+
+    <path d="M 201 780 L 319 653" fill="none" stroke="#c2c1bc" stroke-width="1.4"
+          stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+    <path d="M 423 780 L 407 702" fill="none" stroke="#c2c1bc" stroke-width="1.4"
+          stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+    <path d="M 645 780 L 487 653" fill="none" stroke="#c2c1bc" stroke-width="1.4"
+          stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+
+    <!-- 记忆整理 -->
+    <rect x="78" y="984" width="424" height="96" rx="12" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="100" y="1024" font-size="22" font-weight="600" fill="#21201d">Consolidation · 每 6 轮一次</text>
+    <text x="100" y="1052" font-size="18" fill="#6f6e69">0/12 排队中 → 沉淀成事实</text>
+
+    <path d="M 423 980 V 908" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+    <text x="435" y="966" font-size="18" fill="#a3a29d">沉淀</text>
+
+    <path d="M 790 692 V 1032 H 508" fill="none" stroke="#c2c1bc" stroke-width="1.4"
+          stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+    <text x="778" y="726" text-anchor="end" font-size="18" fill="#a3a29d">存下对话</text>
+
+    <!-- ==================== LLM OPS ==================== -->
+    <rect x="904" y="234" width="248" height="740" rx="16" fill="#eef0fb" stroke="#d7dcf7"/>
+    <text x="928" y="272" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="2" fill="#5e6ad2">LLM OPS</text>
+    <text x="928" y="300" font-size="17" fill="#6f6e69">离线的改进闭环</text>
+
+    <rect x="928" y="338" width="200" height="118" rx="12" fill="#ffffff" stroke="#e2e4f4"/>
+    <text x="950" y="374" font-size="22" font-weight="600" fill="#21201d">Trace</text>
+    <text x="950" y="402" font-size="18" fill="#6f6e69">每一轮 · 一直开着</text>
+    <text x="950" y="428" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">traces/*.jsonl</text>
+
+    <path d="M 1028 456 V 494" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+
+    <rect x="928" y="500" width="200" height="118" rx="12" fill="#ffffff" stroke="#e2e4f4"/>
+    <text x="950" y="536" font-size="22" font-weight="600" fill="#21201d">Eval</text>
+    <text x="950" y="564" font-size="18" fill="#6f6e69">det + judge</text>
+    <text x="950" y="590" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">make eval</text>
+
+    <path d="M 1028 618 V 656" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+
+    <rect x="928" y="662" width="200" height="118" rx="12" fill="#ffffff" stroke="#e2e4f4"/>
+    <text x="950" y="698" font-size="22" font-weight="600" fill="#21201d">Release gate</text>
+    <text x="950" y="726" font-size="18" fill="#6f6e69">det pass · judge pass</text>
+    <text x="950" y="752" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">make gate</text>
+
+    <path d="M 1028 780 V 818" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#hr-arrow)"/>
+
+    <rect x="928" y="824" width="200" height="118" rx="12" fill="#ffffff" stroke="#e2e4f4"/>
+    <text x="950" y="860" font-size="22" font-weight="600" fill="#21201d">Release</text>
+    <text x="950" y="888" font-size="18" fill="#6f6e69">新的提示词与配置</text>
+    <text x="950" y="914" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">→ 回到下一轮</text>
+
+    <!-- 每一轮都被记下来 -->
+    <path d="M 820 644 H 856 V 397 H 900" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#hr-arrow)"/>
+    <text x="884" y="550" text-anchor="middle" font-size="18" fill="#a3a29d"
+          transform="rotate(-90 884 550)">每一轮</text>
+
+    <!-- 放行之后回到下一轮 -->
+    <path d="M 1028 942 V 1140 H 300 V 1116" fill="none" stroke="#c2c1bc"
+          stroke-width="1.4" stroke-dasharray="5 5" marker-end="url(#hr-arrow-dash)"/>
+    <text x="700" y="1126" text-anchor="middle" font-size="18" fill="#a3a29d">Release gate 放行之后，新的提示词 · 模型 · 配置就是下一轮跑的东西</text>
   </g>
-
-  <!-- ============ RIGHT: real proof — the retrieval-gate terminal ============ -->
-  <g>
-    <rect x="700" y="56" width="444" height="228" rx="12" fill="#18181b" stroke="#333338"/>
-    <line x1="700" y1="90" x2="1144" y2="90" stroke="#2a2a2f"/>
-    <circle cx="722" cy="73" r="4" fill="#3a3a40"/>
-    <circle cx="738" cy="73" r="4" fill="#3a3a40"/>
-    <circle cx="754" cy="73" r="4" fill="#3a3a40"/>
-    <text x="1128" y="77" text-anchor="end" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="13" fill="#5f5e66">gate.log</text>
-
-    <g font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="19">
-      <text x="724" y="132" fill="#ececea">you &#8250; what&#8217;s 2+2?</text>
-      <text x="748" y="162"><tspan fill="#6f6e69">gate &#183; skip &#8212; pure math</tspan></text>
-
-      <text x="724" y="204" fill="#ececea">you &#8250; when am I meeting Alex?</text>
-      <text x="748" y="234"><tspan fill="#6f6e69">gate &#183; </tspan><tspan fill="#7c8aec">retrieve</tspan></text>
-      <text x="748" y="260"><tspan fill="#6f6e69">&#8212; references user&#8217;s plans</tspan></text>
-    </g>
-  </g>
-
-  <text x="700" y="300" font-family="ui-monospace,'SF Mono',Menlo,monospace" font-size="16" fill="#5f5e66">hero moment #1 &#8212; skip vs. retrieve</text>
 </svg>

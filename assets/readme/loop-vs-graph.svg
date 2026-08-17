@@ -1,109 +1,110 @@
 <svg xmlns="http://www.w3.org/2000/svg"
-     width="1200" height="460" viewBox="0 0 1200 460"
+     width="1200" height="616" viewBox="0 0 1200 616"
      role="img" aria-labelledby="lvg-title lvg-desc">
-  <title id="lvg-title">The loop versus a graph workflow</title>
-  <desc id="lvg-desc">Left: the loop is one path — think, act, observe, repeat until it can answer. Right: a graph workflow is a map of steps — a small model classifies the message while the calendar loads in parallel, then a route sends a throwaway message to a quick small-model reply and real work into the full agent, which is the same loop running as one node.</desc>
+  <title id="lvg-title">Loop 是一条路，Graph 是一张步骤地图</title>
+  <desc id="lvg-desc">左边是 Loop：Reason、Act、Observe，一条路反复走，直到它能回答。右边是 Triage graph：classify 用小模型给消息分类，check_calendar 同时从磁盘读今天的日历，两件事并行；route 按确定性规则决定走哪条边 —— 小聊天交给 quick_reply，真活儿交给 full_agent，也就是左边那个 Loop 作为 Graph 里的一个节点在跑。任何一步出问题都回退到普通 Loop。</desc>
 
   <defs>
-    <clipPath id="lvg-clip"><rect width="1200" height="460" rx="22"/></clipPath>
-    <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5"
-            markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 1 L 9 5 L 0 9 z" fill="#6b6a73"/>
+    <clipPath id="lvg-clip"><rect width="1200" height="616" rx="20"/></clipPath>
+    <marker id="lv-arrow" viewBox="0 0 10 10" refX="8.5" refY="5"
+            markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#8f8e89"/>
     </marker>
   </defs>
 
   <g clip-path="url(#lvg-clip)">
-    <rect width="1200" height="460" fill="#101012"/>
-    <rect width="1200" height="460" fill="none" stroke="#1c1c1f" stroke-width="1"/>
+    <rect width="1200" height="616" fill="#fafaf9"/>
+    <rect x="0.5" y="0.5" width="1199" height="615" rx="20" fill="none" stroke="#e7e6e4"/>
   </g>
 
-  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif">
+  <g font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif">
 
-    <text x="48" y="48" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="14" letter-spacing="3" fill="#5f5e66">TWO WAYS TO RUN A TURN</text>
+    <text x="48" y="66" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="3" fill="#a3a29d">TWO WAYS TO RUN A TURN</text>
+    <text x="404" y="66" font-size="18" fill="#a3a29d">—— Loop 是默认的那条路，Graph 是可选的形状</text>
 
-    <!-- ============ LEFT — the loop ============ -->
-    <rect x="48" y="76" width="496" height="340" rx="14" fill="#141416" stroke="#26262b"/>
-    <text x="76" y="112" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="14" letter-spacing="2" fill="#7c8aec">THE LOOP</text>
-    <text x="76" y="134" font-size="12.5" fill="#8d8c96">one path, the same three steps, over and over</text>
+    <!-- ==================== 左：循环 ==================== -->
+    <rect x="48" y="96" width="472" height="474" rx="16" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="76" y="140" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="18" letter-spacing="3" fill="#5e6ad2">LOOP</text>
+    <text x="76" y="170" font-size="18" fill="#6f6e69">一条路，反复走</text>
 
-    <rect x="186" y="150" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="296" y="172" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="13.5" letter-spacing="1.5" fill="#ececea">THINK</text>
-    <text x="296" y="190" text-anchor="middle" font-size="11.5" fill="#8d8c96">what should I do next?</text>
+    <rect x="168" y="208" width="232" height="84" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="192" y="246" font-size="22" font-weight="600" fill="#21201d">Reason</text>
+    <text x="192" y="274" font-size="18" fill="#6f6e69">下一步该做什么</text>
 
-    <rect x="186" y="228" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="296" y="250" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="13.5" letter-spacing="1.5" fill="#ececea">ACT</text>
-    <text x="296" y="268" text-anchor="middle" font-size="11.5" fill="#8d8c96">call one tool</text>
+    <path d="M 284 294 V 318" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#lv-arrow)"/>
 
-    <rect x="186" y="304" width="220" height="52" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="296" y="326" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="13.5" letter-spacing="1.5" fill="#ececea">OBSERVE</text>
-    <text x="296" y="344" text-anchor="middle" font-size="11.5" fill="#8d8c96">read what came back</text>
+    <rect x="168" y="324" width="232" height="84" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="192" y="362" font-size="22" font-weight="600" fill="#21201d">Act</text>
+    <text x="192" y="390" font-size="18" fill="#6f6e69">调一个工具</text>
 
-    <path d="M 296 202 V 222" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
-    <path d="M 296 280 V 298" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
-    <path d="M 186 330 H 132 V 176 H 180" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <text x="124" y="253" text-anchor="middle" font-size="11" fill="#8d8c96"
-          transform="rotate(-90 124 253)">until it can answer</text>
+    <path d="M 284 410 V 434" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#lv-arrow)"/>
 
-    <text x="76" y="392" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="11" fill="#5f5e66">syrup/loop/agent.py &#8212; the model picks tools until it stops</text>
+    <rect x="168" y="440" width="232" height="84" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="192" y="478" font-size="22" font-weight="600" fill="#21201d">Observe</text>
+    <text x="192" y="506" font-size="18" fill="#6f6e69">看回来了什么</text>
 
-    <!-- ============ RIGHT — a graph workflow ============ -->
-    <rect x="576" y="76" width="576" height="340" rx="14" fill="#141416" stroke="#26262b"/>
-    <text x="604" y="112" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="14" letter-spacing="2" fill="#e0a458">A GRAPH WORKFLOW</text>
-    <text x="604" y="134" font-size="12.5" fill="#8d8c96">a map of steps: some run side by side, one edge decides where next</text>
+    <path d="M 168 482 H 124 V 250 H 164" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#lv-arrow)"/>
+    <text x="112" y="366" text-anchor="middle" font-size="18" fill="#a3a29d"
+          transform="rotate(-90 112 366)">直到它能回答</text>
 
-    <rect x="604" y="176" width="72" height="36" rx="18" fill="#1e1e22" stroke="#2c2c31"/>
-    <text x="640" y="199" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12" letter-spacing="1" fill="#d8d7de">START</text>
+    <text x="168" y="556" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">loop/agent.py · run_loop 约 95 行</text>
 
-    <rect x="708" y="150" width="196" height="44" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="724" y="170" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12.5" letter-spacing="1" fill="#ececea">CLASSIFY</text>
-    <text x="724" y="186" font-size="11.5" fill="#8d8c96">a small model reads the message</text>
+    <!-- ==================== 右：图工作流 ==================== -->
+    <rect x="552" y="96" width="600" height="474" rx="16" fill="#ffffff" stroke="#e7e6e4"/>
+    <text x="580" y="140" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="18" letter-spacing="3" fill="#b0870f">GRAPH · TRIAGE</text>
+    <text x="580" y="170" font-size="18" fill="#6f6e69">一张步骤地图：有些步骤同时跑，有一条边负责决定</text>
 
-    <rect x="708" y="206" width="196" height="44" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="724" y="226" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12.5" letter-spacing="1" fill="#ececea">CHECK CALENDAR</text>
-    <text x="724" y="242" font-size="11.5" fill="#8d8c96">a local read, at the same time</text>
+    <rect x="580" y="259" width="92" height="48" rx="24" fill="#fafaf9" stroke="#d9d8d5"/>
+    <text x="626" y="290" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="17" letter-spacing="1" fill="#6f6e69">START</text>
 
-    <rect x="944" y="176" width="110" height="44" rx="22" fill="#1e1e22" stroke="#333338"/>
-    <text x="999" y="203" text-anchor="middle" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12.5" letter-spacing="1.5" fill="#ececea">ROUTE</text>
+    <path d="M 672 283 H 692 V 232 H 700" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#lv-arrow)"/>
+    <path d="M 692 283 V 334 H 700" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#lv-arrow)"/>
 
-    <rect x="708" y="300" width="196" height="56" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="724" y="322" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12.5" letter-spacing="1" fill="#ececea">QUICK REPLY</text>
-    <text x="724" y="340" font-size="11.5" fill="#8d8c96">small model answers; the big</text>
-    <text x="724" y="352" font-size="11.5" fill="#8d8c96">one never wakes up</text>
+    <rect x="708" y="190" width="228" height="84" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="732" y="228" font-size="22" font-weight="600" fill="#21201d">classify</text>
+    <text x="732" y="256" font-size="18" fill="#6f6e69">小模型给消息分类</text>
 
-    <rect x="944" y="300" width="196" height="56" rx="10" fill="#18181b" stroke="#2c2c31"/>
-    <text x="960" y="322" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="12.5" letter-spacing="1" fill="#7c8aec">FULL AGENT</text>
-    <text x="960" y="340" font-size="11.5" fill="#8d8c96">the loop on the left, running</text>
-    <text x="960" y="352" font-size="11.5" fill="#8d8c96">as one node of this map</text>
+    <rect x="708" y="292" width="228" height="84" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="732" y="330" font-size="22" font-weight="600" fill="#21201d">check_calendar</text>
+    <text x="732" y="358" font-size="18" fill="#6f6e69">本地一次读，同时进行</text>
 
-    <path d="M 676 194 H 692 V 172 H 702" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <path d="M 676 194 H 692 V 228 H 702" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <path d="M 904 172 H 926 V 190 H 938" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <path d="M 904 228 H 926 V 206 H 938" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <path d="M 999 220 V 268 H 806 V 294" stroke="#6b6a73" stroke-width="1.4" fill="none"
-          marker-end="url(#ar2)"/>
-    <path d="M 1042 220 V 294" stroke="#6b6a73" stroke-width="1.4" fill="none" marker-end="url(#ar2)"/>
-    <text x="818" y="264" font-size="11" fill="#8d8c96">&#8220;thanks!&#8221;</text>
-    <text x="1032" y="263" text-anchor="end" font-size="11" fill="#8d8c96">&#8220;schedule a swim Saturday&#8221;</text>
+    <path d="M 936 232 L 982 271" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#lv-arrow)"/>
+    <path d="M 936 334 L 982 295" fill="none" stroke="#8f8e89" stroke-width="1.4"
+          marker-end="url(#lv-arrow)"/>
 
-    <text x="604" y="392" font-family="ui-monospace,'SF Mono',Menlo,monospace"
-          font-size="11" fill="#5f5e66">syrup/graph/ &#8212; anything that goes wrong falls back to the plain loop</text>
+    <path d="M 1064 237 L 1140 283 L 1064 329 L 988 283 Z" fill="#ffffff"
+          stroke="#b0870f" stroke-width="1.6"/>
+    <text x="1064" y="290" text-anchor="middle" font-size="22" font-weight="600" fill="#21201d">route</text>
+
+    <path d="M 1064 329 V 410 H 690 V 424" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#lv-arrow)"/>
+    <path d="M 1064 329 V 410 H 1014 V 424" fill="none" stroke="#8f8e89"
+          stroke-width="1.4" marker-end="url(#lv-arrow)"/>
+    <text x="702" y="402" font-size="18" fill="#a3a29d">“谢谢！”</text>
+    <text x="1002" y="402" text-anchor="end" font-size="18" fill="#a3a29d">“周六安排个游泳”</text>
+
+    <rect x="580" y="430" width="220" height="94" rx="12" fill="#fafaf9" stroke="#e7e6e4"/>
+    <text x="602" y="466" font-size="22" font-weight="600" fill="#21201d">quick_reply</text>
+    <text x="602" y="492" font-size="18" fill="#6f6e69">小模型答完就走</text>
+    <text x="602" y="516" font-size="18" fill="#a3a29d">大模型根本没醒</text>
+
+    <rect x="904" y="430" width="220" height="94" rx="12" fill="#ffffff" stroke="#5e6ad2" stroke-width="1.6"/>
+    <text x="926" y="466" font-size="22" font-weight="600" fill="#5e6ad2">full_agent</text>
+    <text x="926" y="492" font-size="18" fill="#6f6e69">就是左边那个 Loop</text>
+    <text x="926" y="516" font-size="18" fill="#a3a29d">Graph 里的一个节点</text>
+
+    <text x="580" y="556" font-family="ui-monospace,'SF Mono',Menlo,monospace"
+          font-size="16" fill="#a3a29d">graph/ · 任何一步出问题 → 回退到普通 Loop</text>
   </g>
 </svg>
